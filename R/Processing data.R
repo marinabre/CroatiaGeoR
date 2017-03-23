@@ -315,7 +315,7 @@ for(i in c(1,2,3)){
 #jedini odmah iskoristivi skup podataka je na 7.2.3. sheetu, ovo ostalo će potrajati malo
 
 #RH 8-13, Zagrebačka  15-20, Krapinska 22-27... Zg 155-160
-st_broj_zupanija <- seq(8, 155, 7)
+st_broj_zupanija_prvi <- seq(8, 155, 7)
 
 #trebaju nam headeri
 stanovnistvo_names <- read.xlsx("./data/statistika u nizu/Stanovništvo.xlsx", sheetName = "7.2.1.",
@@ -325,7 +325,7 @@ stanovnistvo_names <- read.xlsx("./data/statistika u nizu/Stanovništvo.xlsx", s
 
 #lista, svaki član liste je ujedno dataframe sa podacima za pojedinu županiju
 stanovnistvo_prirodno_kretanje <- list()
-stanovnistvo_prirodno_kretanje <- lapply(st_broj_zupanija, function(i){
+stanovnistvo_prirodno_kretanje <- lapply(st_broj_zupanija_prvi, function(i){
   read.xlsx("./data/statistika u nizu/Stanovništvo.xlsx", sheetName = "7.2.1.", 
             startRow=i, encoding = "UTF-8", endRow=i+5, 
             colIndex = seq(1,20), 
@@ -334,7 +334,7 @@ stanovnistvo_prirodno_kretanje <- lapply(st_broj_zupanija, function(i){
 
 head(stanovnistvo_prirodno_kretanje)
 names(data.frame(stanovnistvo_prirodno_kretanje[22]))
-st_broj_redaka <- seq(1,5)
+st_broj_redaka_prvi <- seq(1,5)
 
 
 library(dplyr)
@@ -349,7 +349,7 @@ st_razvedeni_brakovi <- stanovnistvo_names[F,]
 for(i in seq(1,22)){
   pom <- data.frame(stanovnistvo_prirodno_kretanje[i])
   #kako bi pokupili naziv županije u svaki redak
-  for(j in st_broj_redaka)    pom[j,][1:2] <- names(pom)[1:2]
+  for(j in st_broj_redaka_prvi)    pom[j,][1:2] <- trimws(gsub(".", " ",names(pom)[1:2], fixed = TRUE))
   #imena moraju biti konzistentna kako bi se moglo dodati na kraj dataframea
   names(pom) <- names(stanovnistvo_names)
   st_zivorodeni <- bind_rows(st_zivorodeni, pom[1,])
@@ -358,6 +358,12 @@ for(i in seq(1,22)){
   st_sklopljeni_brakovi <- bind_rows(st_sklopljeni_brakovi, pom[4,])
   st_razvedeni_brakovi <- bind_rows(st_razvedeni_brakovi, pom[5,])
 }
+#nedostaju - u imenima županija (jer su bili u names pa im je R zamijenio s .), no grad zagreb i RH ne trebaju -
+st_zivorodeni[,1][2:21] <- gsub(" ", "-",st_zivorodeni[,1][2:21])
+st_umrli[,1][2:21] <- gsub(" ", "-",st_zivorodeni[,1][2:21])
+st_prirast[,1][2:21] <- gsub(" ", "-",st_zivorodeni[,1][2:21])
+st_sklopljeni_brakovi[,1][2:21] <- gsub(" ", "-",st_zivorodeni[,1][2:21])
+st_razvedeni_brakovi[,1][2:21] <- gsub(" ", "-",st_zivorodeni[,1][2:21])
 
 write.csv(st_zivorodeni, "./data/processed data/stanovništvo broj živorođenih.csv")
 write.csv(st_umrli, "./data/processed data/stanovništvo broj umrlih.csv")
@@ -365,5 +371,7 @@ write.csv(st_prirast, "./data/processed data/stanovništvo prirodni prirast.csv"
 write.csv(st_sklopljeni_brakovi, "./data/processed data/stanovništvo broj sklopljenih brakova.csv")
 write.csv(st_razvedeni_brakovi, "./data/processed data/stanovništvo broj razvedenih brakova.csv")
 
-
+##7.2.2. DOSELJENO I ODSELJENO STANOVNIŠTVO
+#taman kada pomisliš da je gornji sheet nešto najgore ikad...
+st_broj_zupanija_prvi <- seq(8, 197, 9)
 
