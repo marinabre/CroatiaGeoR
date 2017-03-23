@@ -63,8 +63,8 @@ data.shape$NAME_1[1] <- "Bjelovarsko-Bilogorska"
 # unique(natural$TYPE_1)
 
 
-install.packages('xlsx')
-require(xlsx)
+
+
 stanovnistvo <- read.csv("./data/StanovnistvoPutovanjePoZupanijama.csv")
 stanovnistvo$X2014.Privatno.Putovanja.Inozemstvo.1.i.više.noćenja
 
