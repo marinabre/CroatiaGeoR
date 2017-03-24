@@ -56,46 +56,28 @@ write.csv(uvoz, "./data/processed data/uvoz u tisucama eura.csv")
 
 
 # Bruto domaci proizvod.xlsx ############################# 
-
-bdp <- read.xlsx("./data/statistika u nizu/Bruto domaci proizvod.xlsx", sheetName ="12.1.2.1.", 
-                 startRow=7, encoding = "UTF-8", endRow=33, colIndex = seq(1,17), stringsAsFactors=F)
-#retci 3 i 19 imaju podatke za kontinentalnu /Jadransku hrvatsku, 
-#to ćemo ukloniti kako bi sačuvali uniformnost podataka, retci 2 i 18 su prazni
-
-bdp <- bdp[-c(2,3,18,19), ]
-names(bdp)[1:2] <- names(izvoz)[1:2]
-bdp <- ocisti_dataframe(bdp, 17)
-write.csv(bdp, "./data/processed data/bdp u tisucama kuna.csv")
-
-bdpEuri <- read.xlsx("./data/statistika u nizu/Bruto domaci proizvod.xlsx", sheetName ="12.1.2.1.", 
-                     startRow=7, encoding = "UTF-8", endRow=33, colIndex = seq(19,33), stringsAsFactors=F)
-
-bdpEuri <- bdpEuri[-c(2,3,18,19), ]
-#ovdje su podaci razdijeljeni okomito a ne vodoravno kao u prethodnoj tablici
-#zato nedostaju prva dva stupca s nazivima županija (stoga ćemo ih preuzeti iz prvog seta)
-bdpEuri <- cbind(bdp[,1:2], bdpEuri)
-bdpEuri <- ocisti_dataframe(bdpEuri, 17)
-write.csv(bdpEuri, "./data/processed data/bdp u tisucama eura.csv")
-
-for(i in c(1,2)){
-  bdpPoStanovniku <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Bruto domaci proizvod.xlsx", sheetName ="12.1.2.2.", 
-                               startRow=7, encoding = "UTF-8", endRow=33, 
-                               colIndex = seq(ifelse(i==1, 1, 19), ifelse(i==1, 17, 33)), stringsAsFactors=F), ifelse(i==1, 17, 15))
-  
-  bdpPoStanovniku <- bdpPoStanovniku[-c(2,3,18,19), ]
-  if(i==1){
-    bdpPoStanovniku[1,1:2] <-bdp[1,1:2]
-  }else{
-    bdpPoStanovniku <- cbind(bdp[,1:2], bdpPoStanovniku)
+for(j in c(1,2)){
+  for(i in c(1,2)){
+    bdp <- read.xlsx("./data/statistika u nizu/Bruto domaci proizvod.xlsx", sheetName =ifelse(j==1,"12.1.2.1.", "12.1.2.2."),
+                     startRow=7, encoding = "UTF-8", endRow=33, colIndex = seq(ifelse(i==1,1,19),ifelse(i==1,17,33)), stringsAsFactors=F)
+    #retci 3 i 19 imaju podatke za kontinentalnu /Jadransku hrvatsku, 
+    #to ćemo ukloniti kako bi sačuvali uniformnost podataka, retci 2 i 18 su prazni
+    bdp <- bdp[-c(2,3,18,19), ]
+    if(i==1){
+      names(bdp)[1:2] <- names(izvoz)[1:2]
+      bdp_zup <- bdp[,1:2]
+      bdp_names <- names(bdp)
+    }else{
+      bdp <- cbind(bdp_zup, bdp)
+    }
+    if(j==2) {
+      bdp[,1:2] <- bdp_zup
+      names(bdp) <- bdp_names
+      }
+    bdp <- ocisti_dataframe(bdp, 17)
+    write.csv(bdp, paste("./data/processed data/bdp",ifelse(j==1,"","po stanovniku"),"u tisucama", ifelse(i==1, "kuna", "eura"), ".csv"))
   }
-  names(bdpPoStanovniku)<- names(bdp)
-
-  write.csv(bdpPoStanovniku, paste("./data/processed data/bdp po stanovniku u tisucama", ifelse(i==1, "kuna.csv", "eura.csv")))
 }
-rm(bdpPoStanovniku)
-
-
-
 
 # Građevinarstvo.xlsx ############################# 
 
@@ -191,12 +173,11 @@ for(i in c(1,2)){
 }
 rm(vel_zgrada)
 ## 3.2.5. - ZAVRŠENI STANOVI 
-zavrseni_stanovi <- read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.5.", 
+zavrseni_stanovi <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.5.", 
                               startRow=8, encoding = "UTF-8", endRow=30, 
-                              colIndex = seq(1,30), stringsAsFactors=F)
+                              colIndex = seq(1,30), stringsAsFactors=F), 30)
 
 names(zavrseni_stanovi) <- names(ukupno_velicina_zavrsenih_zgrada)
-zavrseni_stanovi <- ocisti_dataframe(zavrseni_stanovi, 30)
 write.csv(zavrseni_stanovi, paste("./data/processed data/građ ukupni broj završenih stanova za koje su izdane građevinske dozvole.csv"))
 
 
@@ -553,3 +534,29 @@ for(i in seq(1,3)){
 }
 rm(tur_zup)
 rm(tur_luke)
+
+# Zaposlenost i place.xlsx #############################
+#faith in humanity restored!
+zaposlenost <- function(sheet, br_podataka, imena, pocetni_red, zadnji_stupac){
+  zap1 <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Zaposlenost i place.xlsx", sheetName = sheet,
+                                    startRow=pocetni_red, encoding = "UTF-8", endRow=pocetni_red+22,
+                                    colIndex = seq(1,zadnji_stupac), stringsAsFactors=F),zadnji_stupac)
+  write.csv(zap1, paste("./data/processed data/zaposlenost", imena[1], ".csv"))
+  if(br_podataka > 1){
+    zap2 <- read.xlsx("./data/statistika u nizu/Zaposlenost i place.xlsx", sheetName = sheet,
+                                       startRow=7, encoding = "UTF-8", endRow=29,
+                                       colIndex = seq(25,45), stringsAsFactors=F)
+    zap2 <- ocisti_dataframe(cbind(zap1[,1:2], zap2),23)
+    names(zap2) <- names(zap1)
+    write.csv(zap2, paste("./data/processed data/zaposlenost", imena[2], ".csv"))
+  }
+}
+
+zaposlenost("9.2.1.", 2, c("neto plaće", "bruto plaće"), 7, 23)
+zaposlenost("9.2.2.", 1, c("stopa registrirane nezaposlenosti"),8, 19)
+zaposlenost("9.2.3.", 1, c("nezaposleni"),7,19)
+zaposlenost("9.2.4.", 1, c("aktivni osiguranici-individualni poljoprivrednici"),7,19)
+zaposlenost("9.2.5.", 1, c("zaposleni u obrtu i slobodnim profesijama"),7,19)
+zaposlenost("9.2.6.", 1, c("zaposleni u pravnim osobama"),7,19)
+zaposlenost("9.2.7.", 1, c("aktivno stanovništvo"),7,19)
+zaposlenost("9.2.8.", 1, c("ukupno zaposleni"),7,19)
