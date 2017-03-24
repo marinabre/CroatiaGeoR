@@ -1,42 +1,54 @@
 install.packages('xlsx')
+library(xlsx)
 require(xlsx)
+
+#### trimws(x) ---> uklanja leading & trailing spaces
+ocisti_dataframe <- function(df,br_stupaca){
+  df[df == "-"] <- NA
+  df[,3:br_stupaca] <- sapply(df[,3:br_stupaca], function(x){as.numeric(gsub(' ', '',x))})
+  df[,1] <- trimws(gsub(" županija","",df[,1]))
+  df[,2] <- trimws(df[,2])
+  names(df) <- gsub('X', '',names(df))
+  rownames(df) <- NULL
+  df
+}
+
 
 # Robna razmjena s inozemstvom.xlsx ############################# 
 
 izvoz <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx", sheetName ="4.2.3.1.", 
                    startRow=8, encoding = "UTF-8", endRow=33, colIndex = seq(1,19))
-names(izvoz)
+
 # ako želimo ukloniti samo  prva dva prazna retka, izvoz[-seq(1,3), ] ako želimo ukloniti i podatke za cijelu državu
 izvoz <- izvoz[-c(1,2), ]
 names(izvoz)[1] <- "Županija"
-names(izvoz)[2] <- "County of"
+names(izvoz)[2] <- "County.of"
 #u xlsx fileu 2016 ima footnote koji se u Ru ispisuje kao "X2016.1............."
 names(izvoz)[19] <- "X2016."
+izvoz <- ocisti_dataframe(izvoz, 19)
+
 uvoz <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx", sheetName ="4.2.3.1.", 
                   startRow=34, encoding = "UTF-8", endRow=57, colIndex = seq(1,19))
-head(uvoz)
 names(uvoz) <- names(izvoz)
-
-#resetiranje brojeva redaka
-rownames(izvoz) <- NULL
-rownames(uvoz) <- NULL
+uvoz <- ocisti_dataframe(uvoz, 19)
 
 write.csv(izvoz, "./data/processed data/izvoz u tisucama kuna.csv")
 write.csv(uvoz, "./data/processed data/uvoz u tisucama kuna.csv")
 
 izvozEuri <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx", sheetName ="4.2.3.2.", 
-                       startRow=8, encoding = "UTF-8", endRow=33, colIndex = seq(1,19))
+                       startRow=8, encoding = "UTF-8", endRow=33, colIndex = seq(1,9))
+
 izvozEuri <- izvozEuri[-c(1,2), ]
-names(izvozEuri)[1] <- "Županija"
-names(izvozEuri)[2] <- "County of"
+names(izvozEuri)[1:2] <- names(izvoz)[1:2]
 names(izvozEuri)[9] <- "X2016."
+izvozEuri <- ocisti_dataframe(izvozEuri, 9)
 
 uvozEuri <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx", sheetName ="4.2.3.2.", 
-                      startRow=34, encoding = "UTF-8", endRow=57, colIndex = seq(1,19))
-names(uvozEuri) <- names(izvozEuri)
+                      startRow=34, encoding = "UTF-8", endRow=57, colIndex = seq(1,9))
 
-rownames(izvozEuri) <- NULL
-rownames(uvozEuri) <- NULL
+names(uvozEuri) <- names(izvozEuri)
+uvozEuri <- ocisti_dataframe(uvozEuri, 9)
+
 write.csv(izvoz, "./data/processed data/izvoz u tisucama eura.csv")
 write.csv(uvoz, "./data/processed data/uvoz u tisucama eura.csv")
 
@@ -51,25 +63,24 @@ bdp <- read.xlsx("./data/statistika u nizu/Bruto domaci proizvod.xlsx", sheetNam
 #to ćemo ukloniti kako bi sačuvali uniformnost podataka, retci 2 i 18 su prazni
 
 bdp <- bdp[-c(2,3,18,19), ]
-names(bdp)[1] <- "Županija"
-names(bdp)[2] <- "County of"
-rownames(bdp) <- NULL
+names(bdp)[1:2] <- names(izvoz)[1:2]
+bdp <- ocisti_dataframe(bdp, 17)
 write.csv(bdp, "./data/processed data/bdp u tisucama kuna.csv")
 
 bdpEuri <- read.xlsx("./data/statistika u nizu/Bruto domaci proizvod.xlsx", sheetName ="12.1.2.1.", 
                      startRow=7, encoding = "UTF-8", endRow=33, colIndex = seq(19,33), stringsAsFactors=F)
 
 bdpEuri <- bdpEuri[-c(2,3,18,19), ]
-rownames(bdpEuri) <- NULL
 #ovdje su podaci razdijeljeni okomito a ne vodoravno kao u prethodnoj tablici
 #zato nedostaju prva dva stupca s nazivima županija (stoga ćemo ih preuzeti iz prvog seta)
 bdpEuri <- cbind(bdp[,1:2], bdpEuri)
+bdpEuri <- ocisti_dataframe(bdpEuri, 17)
 write.csv(bdpEuri, "./data/processed data/bdp u tisucama eura.csv")
 
 for(i in c(1,2)){
-  bdpPoStanovniku <- read.xlsx("./data/statistika u nizu/Bruto domaci proizvod.xlsx", sheetName ="12.1.2.2.", 
+  bdpPoStanovniku <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Bruto domaci proizvod.xlsx", sheetName ="12.1.2.2.", 
                                startRow=7, encoding = "UTF-8", endRow=33, 
-                               colIndex = seq(ifelse(i==1, 1, 19), ifelse(i==1, 17, 33)), stringsAsFactors=F)
+                               colIndex = seq(ifelse(i==1, 1, 19), ifelse(i==1, 17, 33)), stringsAsFactors=F), ifelse(i==1, 17, 15))
   
   bdpPoStanovniku <- bdpPoStanovniku[-c(2,3,18,19), ]
   if(i==1){
@@ -78,10 +89,10 @@ for(i in c(1,2)){
     bdpPoStanovniku <- cbind(bdp[,1:2], bdpPoStanovniku)
   }
   names(bdpPoStanovniku)<- names(bdp)
-  rownames(bdpPoStanovniku) <- NULL
+
   write.csv(bdpPoStanovniku, paste("./data/processed data/bdp po stanovniku u tisucama", ifelse(i==1, "kuna.csv", "eura.csv")))
 }
-
+rm(bdpPoStanovniku)
 
 
 
@@ -97,8 +108,7 @@ ukupno_izdanih_dozvola <- read.xlsx("./data/statistika u nizu/Građevinarstvo.xl
 
 ukupno_izdanih_dozvola[23,1] <- "Neraspoređeno"
 ukupno_izdanih_dozvola[23,2] <- "Unclassified"
-ukupno_izdanih_dozvola[,1] <- gsub(" županija","",ukupno_izdanih_dozvola[,1])
-
+ukupno_izdanih_dozvola <- ocisti_dataframe(ukupno_izdanih_dozvola, 16)
 write.csv(ukupno_izdanih_dozvola, "./data/processed data/građ ukupno izdanih građevinskih dozvola.csv")
 
 gradevina_stupci <- c(1, 18, 33, 48, 63, 78, 93)
@@ -106,50 +116,54 @@ gradevina_prvi_sheet <- c("za zgrade.csv", "za ostale građevine.csv")
 grad_zupanije_Unclassified <- ukupno_izdanih_dozvola[,1:2]
 
 for(i in c(1,2)){
-  sobni_stanovi <- read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.1.", 
+  sobni_stanovi <- ocisti_dataframe(
+            read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.1.", 
                              startRow=7, encoding = "UTF-8", endRow=30, 
                              colIndex = seq(gradevina_stupci[i+1], gradevina_stupci[i+1]+ 13), 
-                             stringsAsFactors=F)
+                             stringsAsFactors=F), 14)
   
   sobni_stanovi <- cbind(grad_zupanije_Unclassified, sobni_stanovi)
   write.csv(sobni_stanovi, paste("./data/processed data/građ izdane građevinske dozvole", gradevina_prvi_sheet[i]))
 }
-
+rm(sobni_stanovi)
 gradevina_zupanije
 
 ##3.2.2. - GRAĐEVINSKE VELIČINE ZGRADA ZA KOJE SU IZDANE GRAĐEVINSKE DOZVOLE (novogradnja i dogradnja)
 gradevina_drugi_sheet <- c("ukupna veličina", "veličina stambenih", "veličina nestambenih")
 
 for(i in c(1,2,3)){
-  sobni_stanovi <- read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.2.", 
+  sobni_stanovi <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.2.", 
                              startRow=7, encoding = "UTF-8", endRow=29, 
                              colIndex = seq(gradevina_stupci[i], ifelse(i==1, gradevina_stupci[i]+ 15, gradevina_stupci[i]+ 13)),
-                             stringsAsFactors=F)
+                             stringsAsFactors=F), ifelse(i==1, 16, 14))
   if(i != 1){
     sobni_stanovi <- cbind(gradevina_zupanije, sobni_stanovi)
   }else{
-    sobni_stanovi[,1] <- gsub(" županija","",sobni_stanovi[,1])
     gradevina_zupanije <- sobni_stanovi[,1:2]
   }
   write.csv(sobni_stanovi, paste("./data/processed data/građ", gradevina_drugi_sheet[i], "zgrada za koje su izdane građevinske dozvole.csv"))
 }
-
+rm(sobni_stanovi)
 
 ##3.2.3. - BROJ I POVRŠINA STANOVA ZA KOJE SU IZDANE GRAĐEVINSKE DOZVOLE
 gradevina_treci_sheet <- c("broj stanova", "korisna površina m2 stanova")
 for(i in c(1,2)){
-  sobni_stanovi <- read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.3.", 
+  sobni_stanovi <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.3.", 
                              startRow=7, encoding = "UTF-8", endRow=29, 
                              colIndex = seq(gradevina_stupci[i], gradevina_stupci[i]+ 13), 
-                             stringsAsFactors=F)
+                             stringsAsFactors=F), 14)
   
-  sobni_stanovi <- cbind(gradevina_zupanije, sobni_stanovi)
+  if(i !=1) sobni_stanovi <- cbind(gradevina_zupanije, sobni_stanovi)
+  
   write.csv(sobni_stanovi, paste("./data/processed data/građ", gradevina_treci_sheet[i], "za koje su izdane građevinske dozvole.csv"))
 }
-
+rm(sobni_stanovi)
+rm(gradevina_zupanije)
 ##3.2.4. - BROJ I GRAĐEVINSKE VELIČINE ZAVRŠENIH ZGRADA
 
-ukupno_velicina_zavrsenih_zgrada <- read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.4.", startRow=7, encoding = "UTF-8", endRow=30, colIndex = seq(1,30), stringsAsFactors=F)
+ukupno_velicina_zavrsenih_zgrada <- read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.4.", 
+                                              startRow=7, encoding = "UTF-8", endRow=30, 
+                                              colIndex = seq(1,30), stringsAsFactors=F)
 names(ukupno_velicina_zavrsenih_zgrada)
 ##header je rascjepkan kroz dva retka
 ##		                2002.		2003.		2004.		2005.		2006.		2007.		2008.		2009.		2010.		2011.		2012.		2013.		2014.		2015.	
@@ -160,10 +174,8 @@ names(ukupno_velicina_zavrsenih_zgrada)[2] <- ukupno_velicina_zavrsenih_zgrada[1
 names(ukupno_velicina_zavrsenih_zgrada)[c(FALSE, TRUE)][-1] <- paste(substr(names(ukupno_velicina_zavrsenih_zgrada)[c(TRUE, FALSE)][-1],1,6), "površina, m2")
 names(ukupno_velicina_zavrsenih_zgrada)[c(TRUE, FALSE)][-1] <- paste(names(ukupno_velicina_zavrsenih_zgrada)[c(TRUE, FALSE)][-1], "broj")
 
-names(ukupno_velicina_zavrsenih_zgrada)
 ukupno_velicina_zavrsenih_zgrada <- ukupno_velicina_zavrsenih_zgrada[-c(1), ]
-rownames(ukupno_velicina_zavrsenih_zgrada) <- NULL
-ukupno_velicina_zavrsenih_zgrada[,1] <- gradevina_zupanije[,1] #uklanjanje županija s kraja imena
+ukupno_velicina_zavrsenih_zgrada <- ocisti_dataframe(ukupno_velicina_zavrsenih_zgrada, 30)
 
 write.csv(ukupno_velicina_zavrsenih_zgrada, paste("./data/processed data/građ ukupna veličina završenih zgrada za koje su izdane građevinske dozvole.csv"))
 
@@ -175,16 +187,17 @@ for(i in c(1,2)){
   
   vel_zgrada <- cbind(ukupno_velicina_zavrsenih_zgrada[,1:2], vel_zgrada)
   names(vel_zgrada) <- names(ukupno_velicina_zavrsenih_zgrada)
+  vel_zgrada <- ocisti_dataframe(vel_zgrada, 30)
   write.csv(vel_zgrada, paste("./data/processed data/građ", gradevina_drugi_sheet[i+1], "(završenih) zgrada za koje su izdane građevinske dozvole.csv"))
 }
-
+rm(vel_zgrada)
 ## 3.2.5. - ZAVRŠENI STANOVI 
 zavrseni_stanovi <- read.xlsx("./data/statistika u nizu/Građevinarstvo.xlsx", sheetName ="3.2.5.", 
                               startRow=8, encoding = "UTF-8", endRow=30, 
                               colIndex = seq(1,30), stringsAsFactors=F)
 
 names(zavrseni_stanovi) <- names(ukupno_velicina_zavrsenih_zgrada)
-zavrseni_stanovi[,1] <- gradevina_zupanije[,1]
+zavrseni_stanovi <- ocisti_dataframe(zavrseni_stanovi, 30)
 write.csv(zavrseni_stanovi, paste("./data/processed data/građ ukupni broj završenih stanova za koje su izdane građevinske dozvole.csv"))
 
 
@@ -200,10 +213,10 @@ grad_fja_obrada <- function(brojIteracija, sheet, pocetniRed, krajnjiRed, zupani
     }else{
       sobni_stanovi[,1] <- zupanija[,1]
     }
+    sobni_stanovi <- ocisti_dataframe(sobni_stanovi, 15)
     write.csv(sobni_stanovi, paste("./data/processed data/građ", sheetImena[i], "za koje su izdane građevinske dozvole.csv"))
   }
 }
-
 gradevina_sesti_sheet <- c("1-sobni završeni stanovi", "2-sobni završeni stanovi", "3-sobni završeni stanovi", "4-sobni završeni stanovi", "5-sobni i višesobni završeni stanovi")
 grad_fja_obrada(seq(1,5), "3.2.6.", 7, 29, gradevina_zupanije, gradevina_sesti_sheet)
 
@@ -212,15 +225,14 @@ grad_fja_obrada(seq(1,5), "3.2.6.", 7, 29, gradevina_zupanije, gradevina_sesti_s
 #iste županije kao u 1. (ima unclassified na dnu)
 #godine 2002-2015, okomito odvojenih setova podataka: 7
 #Ukupno, Stambene zgrade, Nestambene zgrade, Prometna infrakstruktura, Cjevovodi, komunikacijski i električni vodovi, Složene građevine na industrijskim prostorima, Ostale nespomenute građevine
-gradevina_sedmi_sheet <- c("ukupna", "stambene zgrade", "nestambene zgrade", "prometna infrakstruktura", "cjevovodi, komunikacijski i električni vodovi", "složene građevine na industrijskim prostorima", "ostale nespomenute građevine")
+gradevina_sedmi_sheet <- c("ukupna vrijednost", "vrijednost stambenih zgrada", "vrijednost nestambenih zgrada", "vrijednost prometne infrakstrukture", "vrijednost cjevovoda, komunikacijskih i električnih vodova", "vrijednost složenih građevina na industrijskim prostorima", "vrijednost ostalih nespomenutih građevina")
 grad_fja_obrada(seq(1,7), "3.2.7.", 7, 30, grad_zupanije_Unclassified, gradevina_sedmi_sheet)
 
 # Industrija.xlsx ############################# 
-industrija <- read.xlsx("./data/statistika u nizu/Industrija.xlsx", sheetName ="2.1.2.1.", 
+industrija <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Industrija.xlsx", sheetName ="2.1.2.1.", 
                            startRow=9, encoding = "UTF-8", endRow=32, 
                            colIndex = seq(1,15), 
-                           stringsAsFactors=F
-)
+                           stringsAsFactors=F), 15)
 write.csv(industrija, "./data/processed data/industrija ukupna vrijednost prodanih proizvoda po NP-u.csv")
 
 
@@ -229,62 +241,59 @@ kultura_sheetovi <- c("8.3.1.","8.3.2.","8.3.3.","8.3.4.","8.3.5.")
 kultura_podaci <- c("kina", "sjedala u kinima", "posjetitelja u kinima", "radiopretplatnika", "tv pretplatnika")
 
 for(i in seq(1,5)){
-  kultura <- read.xlsx("./data/statistika u nizu/Kultura.xlsx", sheetName =kultura_sheetovi[i], 
+  kultura <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Kultura.xlsx", sheetName =kultura_sheetovi[i], 
                           startRow=7, encoding = "UTF-8", endRow=29, 
                           colIndex = seq(1,25), 
-                          stringsAsFactors=F
-  )
+                          stringsAsFactors=F),25)
   write.csv(kultura, paste("./data/processed data/kultura broj", kultura_podaci[i], ".csv"))
 }
-
+rm(kultura)
 # Obrazovanje.xlsx ############################# 
 #prva tri sheeta - broj ustanova i broj djece okomito odvojeni, županije normalno raspisane
 #zadnja dva ukupno i redovni 1.4. -akademske godine, 1.5. - obične godine
 obrazovanje_sheetovi_1 <- c("8.1.1.", "8.1.2.", "8.1.3.")
 obrazovanje_podaci_1 <- c("dječji vrtići", "osnovne škole", "srednje škole")
 
-#### trimws(x) ---> uklanja leading & trailing spaces
-
 for(i in c(1,2,3)){
-  obrazovanje_ustanove <- read.xlsx("./data/statistika u nizu/Obrazovanje.xlsx", sheetName = obrazovanje_sheetovi_1[i], 
+  obrazovanje_ustanove <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Obrazovanje.xlsx", sheetName = obrazovanje_sheetovi_1[i], 
                            startRow=7, encoding = "UTF-8", endRow=29, 
                            colIndex = seq(1,13), 
-                           stringsAsFactors=F)
+                           stringsAsFactors=F),13)
   
   obrazovanje_djeca <- read.xlsx("./data/statistika u nizu/Obrazovanje.xlsx", sheetName = obrazovanje_sheetovi_1[i], 
                             startRow=7, encoding = "UTF-8", endRow=29, 
                             colIndex = seq(15,25), 
                             stringsAsFactors=F)
-  obrazovanje_ustanove[obrazovanje_ustanove== "-"] <- NA
-  obrazovanje_djeca[obrazovanje_djeca== "-"] <- NA
-  obrazovanje_ustanove[,1] <- trimws(obrazovanje_ustanove[,1])
-  obrazovanje_ustanove[,2] <- trimws(obrazovanje_ustanove[,2])
+  
   obrazovanje_djeca <- cbind(obrazovanje_ustanove[,1:2], obrazovanje_djeca)
+  obrazovanje_djeca <- ocisti_dataframe(obrazovanje_djeca, 13)
+  
   write.csv(obrazovanje_ustanove, paste("./data/processed data/obrazovanje", obrazovanje_podaci_1[i],"broj ustanova.csv"))
   write.csv(obrazovanje_djeca, paste("./data/processed data/obrazovanje", obrazovanje_podaci_1[i], "broj djece.csv"))
 }
-
+rm(obrazovanje_ustanove)
+rm(obrazovanje_djeca)
 obrazovanje_sheetovi_2 <- c("8.1.4.", "8.1.5.")
 obrazovanje_podaci_2 <- c("upisanih studenata.csv", "studenata koji su završili.csv")
 for(i in c(1,2)){
-  obrazovanje_ukupno <- read.xlsx("./data/statistika u nizu/Obrazovanje.xlsx", sheetName = obrazovanje_sheetovi_2[i], 
+  obrazovanje_ukupno <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Obrazovanje.xlsx", sheetName = obrazovanje_sheetovi_2[i], 
                                   startRow=7, encoding = "UTF-8", endRow=30, 
                                   colIndex = seq(1,ifelse(i==1,22,23)), 
-                                  stringsAsFactors=F)
+                                  stringsAsFactors=F), ifelse(i==1,22,23))
   
   obrazovanje_redovni <- read.xlsx("./data/statistika u nizu/Obrazovanje.xlsx", sheetName = obrazovanje_sheetovi_2[i], 
                                   startRow=7, encoding = "UTF-8", endRow=30, 
                                   colIndex = seq(ifelse(i==1, 24, 25),ifelse(i==1,43,45)), 
                                   stringsAsFactors=F)
-  obrazovanje_ustanove[obrazovanje_ustanove== "-"] <- NA
-  obrazovanje_djeca[obrazovanje_djeca== "-"] <- NA
-  obrazovanje_ukupno[,1] <- trimws(obrazovanje_ukupno[,1])
-  obrazovanje_ukupno[,2] <- trimws(obrazovanje_ukupno[,2])
+  
   obrazovanje_redovni <- cbind(obrazovanje_ukupno[,1:2], obrazovanje_redovni)
+  obrazovanje_redovni <- ocisti_dataframe(obrazovanje_redovni, ifelse(i==1,22,23))
+  
   write.csv(obrazovanje_ukupno, paste("./data/processed data/obrazovanje ukupan broj", obrazovanje_podaci_2[i]))
   write.csv(obrazovanje_redovni, paste("./data/processed data/obrazovanje broj redovnih", obrazovanje_podaci_2[i]))
 }
-
+rm(obrazovanje_ukupno)
+rm(obrazovanje_redovni)
 
 
 # Okoliš.xlsx ############################# 
@@ -298,18 +307,16 @@ for(i in c(1,2,3)){
                       colIndex = seq(okolis_stupci[i], ifelse(i==1, okolis_stupci[i]+ 9, okolis_stupci[i]+ 7)), 
                       stringsAsFactors=F)
   okolis <- okolis[-c(2),]
-  rownames(okolis) <- NULL
   if(i != 1){
     okolis <- cbind(okolis_zupanije, okolis)
   }else{
-    okolis[,1]<- trimws(okolis[,1])
-    okolis[,2]<- trimws(okolis[,2])
     okolis_zupanije <- okolis[,1:2]
   }
-  names(okolis)[10] <- "X2015" #micanje anotacije
+  names(okolis)[10] <- "X2015." #micanje anotacije
+  okolis <- ocisti_dataframe(okolis, 10)
   write.csv(okolis, paste("./data/processed data/zaštita okoliša", okolis_imena[i]))
 }
-
+rm(okolis)
 
 # Stanovništvo.xlsx #############################
 #jedini odmah iskoristivi skup podataka je na 7.2.3. sheetu, ovo ostalo će potrajati malo
@@ -318,10 +325,10 @@ for(i in c(1,2,3)){
 st_broj_zupanija_prvi <- seq(8, 155, 7)
 
 #trebaju nam headeri
-stanovnistvo_names <- read.xlsx("./data/statistika u nizu/Stanovništvo.xlsx", sheetName = "7.2.1.",
+stanovnistvo_names <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Stanovništvo.xlsx", sheetName = "7.2.1.",
           startRow=7, encoding = "UTF-8", endRow=8,
           colIndex = seq(1,20),
-          stringsAsFactors=F)
+          stringsAsFactors=F),20)
 
 #lista, svaki član liste je ujedno dataframe sa podacima za pojedinu županiju
 stanovnistvo_prirodno_kretanje <- list()
@@ -333,9 +340,6 @@ stanovnistvo_prirodno_kretanje <- lapply(st_broj_zupanija_prvi, function(i){
 })
 
 head(stanovnistvo_prirodno_kretanje)
-names(data.frame(stanovnistvo_prirodno_kretanje[22]))
-st_broj_redaka_prvi <- seq(1,5)
-
 
 library(dplyr)
 #za svaki set podataka definiramo zasebni dataframe, stavljamo prazan al sa imenima koja nam trebaju
@@ -347,9 +351,14 @@ st_razvedeni_brakovi <- stanovnistvo_names[F,]
 
 
 for(i in seq(1,22)){
-  pom <- data.frame(stanovnistvo_prirodno_kretanje[i])
+  pom <- ocisti_dataframe(data.frame(stanovnistvo_prirodno_kretanje[i]), 20)
+
   #kako bi pokupili naziv županije u svaki redak
-  for(j in st_broj_redaka_prvi)    pom[j,][1:2] <- trimws(gsub(".", " ",names(pom)[1:2], fixed = TRUE))
+  for(j in seq(1,5))    pom[j,][1:2] <- trimws(gsub(".", " ",names(pom)[1:2], fixed = TRUE))
+  
+  #nedostaju - u imenima županija (jer su bili u names pa im je R zamijenio s .), no grad zagreb i RH ne trebaju -
+  pom[,1][2:5] <- gsub(" ", "-",pom[,1][2:5])
+  
   #imena moraju biti konzistentna kako bi se moglo dodati na kraj dataframea
   names(pom) <- names(stanovnistvo_names)
   st_zivorodeni <- bind_rows(st_zivorodeni, pom[1,])
@@ -358,12 +367,7 @@ for(i in seq(1,22)){
   st_sklopljeni_brakovi <- bind_rows(st_sklopljeni_brakovi, pom[4,])
   st_razvedeni_brakovi <- bind_rows(st_razvedeni_brakovi, pom[5,])
 }
-#nedostaju - u imenima županija (jer su bili u names pa im je R zamijenio s .), no grad zagreb i RH ne trebaju -
-st_zivorodeni[,1][2:21] <- gsub(" ", "-",st_zivorodeni[,1][2:21])
-st_umrli[,1][2:21] <- gsub(" ", "-",st_zivorodeni[,1][2:21])
-st_prirast[,1][2:21] <- gsub(" ", "-",st_zivorodeni[,1][2:21])
-st_sklopljeni_brakovi[,1][2:21] <- gsub(" ", "-",st_zivorodeni[,1][2:21])
-st_razvedeni_brakovi[,1][2:21] <- gsub(" ", "-",st_zivorodeni[,1][2:21])
+rm(pom)
 
 write.csv(st_zivorodeni, "./data/processed data/stanovništvo broj živorođenih.csv")
 write.csv(st_umrli, "./data/processed data/stanovništvo broj umrlih.csv")
@@ -373,5 +377,89 @@ write.csv(st_razvedeni_brakovi, "./data/processed data/stanovništvo broj razved
 
 ##7.2.2. DOSELJENO I ODSELJENO STANOVNIŠTVO
 #taman kada pomisliš da je gornji sheet nešto najgore ikad...
-st_broj_zupanija_prvi <- seq(8, 197, 9)
+stanovnistvo_names <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Stanovništvo.xlsx", sheetName = "7.2.2.",
+                                startRow=7, encoding = "UTF-8", endRow=8,
+                                colIndex = seq(1,20),
+                                stringsAsFactors=F), 20)
 
+stanovnistvo_doseljeno_iseljeno <- list()
+stanovnistvo_doseljeno_iseljeno <- lapply(seq(8, 197, 9), function(i){
+  read.xlsx("./data/statistika u nizu/Stanovništvo.xlsx", sheetName = "7.2.2.", 
+            startRow=i, encoding = "UTF-8", endRow=i+7, 
+            colIndex = seq(1,20), 
+            stringsAsFactors=F)
+})
+
+st_saldo <- stanovnistvo_names[F,]
+st_doseljeni <- stanovnistvo_names[F,]
+st_doseljeni_druga_zup <- stanovnistvo_names[F,]
+st_doseljeni_druga_drz <- stanovnistvo_names[F,]
+st_odseljeni <- stanovnistvo_names[F,]
+st_odseljeni_druga_zup <- stanovnistvo_names[F,]
+st_odseljeni_druga_drz <- stanovnistvo_names[F,]
+
+for(i in seq(1,22)){
+  pom <- ocisti_dataframe(data.frame(stanovnistvo_doseljeno_iseljeno[i]), 20)
+  
+  #kako bi pokupili naziv županije u svaki redak
+  for(j in seq(1,7))    pom[j,][1:2] <- trimws(gsub(".", " ",names(pom)[1:2], fixed = TRUE))
+  
+  #nedostaju - u imenima županija (jer su bili u names pa im je R zamijenio s .), no grad zagreb i RH ne trebaju -
+  pom[,1][2:7] <- gsub(" ", "-",pom[,1][2:7])
+
+  #imena moraju biti konzistentna kako bi se moglo dodati na kraj dataframea
+  names(pom) <- names(stanovnistvo_names)
+  st_saldo <- bind_rows(st_saldo, pom[1,])
+  st_doseljeni <- bind_rows(st_doseljeni, pom[2,])
+  st_doseljeni_druga_zup <- bind_rows(st_doseljeni_druga_zup, pom[3,])
+  st_doseljeni_druga_drz <- bind_rows(st_doseljeni_druga_drz, pom[4,])
+  st_odseljeni <- bind_rows(st_odseljeni, pom[5,])
+  st_odseljeni_druga_zup <- bind_rows(st_odseljeni_druga_zup, pom[6,])
+  st_odseljeni_druga_drz <- bind_rows(st_odseljeni_druga_drz, pom[7,])
+}
+rm(pom)
+
+write.csv(st_saldo, "./data/processed data/stanovništvo saldo migracije s inozemstvom.csv")
+write.csv(st_doseljeni, "./data/processed data/stanovništvo broj doseljenih.csv")
+write.csv(st_doseljeni_druga_zup, "./data/processed data/stanovništvo broj doseljenih iz druge županije.csv")
+write.csv(st_doseljeni_druga_drz, "./data/processed data/stanovništvo broj broj doseljenih iz druge države.csv")
+write.csv(st_odseljeni, "./data/processed data/stanovništvo broj odseljenih.csv")
+write.csv(st_odseljeni_druga_zup, "./data/processed data/stanovništvo broj odseljenih u drugu županiju.csv")
+write.csv(st_odseljeni_druga_drz, "./data/processed data/stanovništvo broj odseljenih u drugu državu.csv")
+
+##7.2.3. PROCJENA UKUPNOG BROJA STANOVNIKA SREDINOM GODINE
+stanovnistvo_procjena <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Stanovništvo.xlsx", sheetName = "7.2.3.",
+                                startRow=7, encoding = "UTF-8", endRow=29,
+                                colIndex = seq(1,17),
+                                stringsAsFactors=F),17)
+
+names(stanovnistvo_procjena)[3:17] <- gsub('.{2}$', '', names(stanovnistvo_procjena)[3:17] ) #micanje anotacija s godina
+write.csv(stanovnistvo_procjena, "./data/processed data/stanovništvo procjena br st sredinom godine.csv")
+
+
+# Transport.xlsx #############################
+tran_cestovna <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.1.",
+                                   startRow=9, encoding = "UTF-8", endRow=32,
+                                   colIndex = seq(1,13),
+                                   stringsAsFactors=F), 13)
+tran_cestovna <- tran_cestovna[-c(2),]
+write.csv(tran_cestovna, "./data/processed data/transport ukupni broj cestovnih mreža.csv")
+
+#4
+tran_sheet1 <-c("autocesta.csv", "državnih cesta.csv", "županijskih cesta.csv", "lokalnih cesta.csv")
+tran_stupci <- c(15,27,39,51)
+for(i in seq(1,4)){
+  tran_ceste <- read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.1.",
+                             startRow=9, encoding = "UTF-8", endRow=32,
+                             colIndex = seq(tran_stupci[i],tran_stupci[i]+10), 
+                             stringsAsFactors=F)
+  tran_ceste <- tran_ceste[-c(2),]
+  ##autoceste nemaju vrijednost u prva dva stupca, a R odbija prepoznati "..."
+  if(i == 1){
+    tran_ceste[1:2] <-NA
+  }
+  tran_ceste <- cbind(tran_cestovna[,1:2], tran_ceste)
+  tran_ceste <- ocisti_dataframe(tran_ceste, 13)
+  write.csv(tran_ceste, paste("./data/processed data/transport ukupni broj", tran_sheet1[i]))
+}
+rm(tran_ceste)
