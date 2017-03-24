@@ -126,7 +126,6 @@ for(i in c(1,2)){
   write.csv(sobni_stanovi, paste("./data/processed data/građ izdane građevinske dozvole", gradevina_prvi_sheet[i]))
 }
 rm(sobni_stanovi)
-gradevina_zupanije
 
 ##3.2.2. - GRAĐEVINSKE VELIČINE ZGRADA ZA KOJE SU IZDANE GRAĐEVINSKE DOZVOLE (novogradnja i dogradnja)
 gradevina_drugi_sheet <- c("ukupna veličina", "veličina stambenih", "veličina nestambenih")
@@ -458,8 +457,99 @@ for(i in seq(1,4)){
   if(i == 1){
     tran_ceste[1:2] <-NA
   }
-  tran_ceste <- cbind(tran_cestovna[,1:2], tran_ceste)
-  tran_ceste <- ocisti_dataframe(tran_ceste, 13)
+  tran_ceste <- ocisti_dataframe(cbind(tran_cestovna[,1:2], tran_ceste), 13)
   write.csv(tran_ceste, paste("./data/processed data/transport ukupni broj", tran_sheet1[i]))
 }
 rm(tran_ceste)
+
+tran_gustoca <- read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.2.",
+                                            startRow=8, encoding = "UTF-8", endRow=31,
+                                            colIndex = seq(1,13),
+                                            stringsAsFactors=F)
+tran_gustoca <- ocisti_dataframe(tran_gustoca[-c(2),], 13)
+write.csv(tran_gustoca, "./data/processed data/transport gustoća cestovne mreže.csv")
+
+tran_prijevoz_robe <- read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.3.",
+                                           startRow=9, encoding = "UTF-8", endRow=32,
+                                           colIndex = seq(1,17),
+                                           stringsAsFactors=F)
+tran_prijevoz_robe <- ocisti_dataframe(tran_prijevoz_robe[-c(2),], 17)
+write.csv(tran_prijevoz_robe, "./data/processed data/transport cestovni prijevoz robe.csv")
+
+tran_nesrece_imena <- c("ukupno.csv", "s poginulim osobama.csv", "s ozlijeđenim osobama.csv")
+tran_sheetovi <- c("5.4.4.","5.4.5.")
+
+for (j in c(1,2)){
+  for(i in seq(1,3)){
+    tran_nesrece <- read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = tran_sheetovi[j],
+                                                     startRow=7, encoding = "UTF-8", endRow=29,
+                                                     colIndex = seq( ifelse(i==1,1, ifelse(i==2,17,31)), ifelse(i==1,15, ifelse(i==2,29,43))),
+                                                     stringsAsFactors=F)
+    tran_nesrece <- tran_nesrece[-c(2),]
+    if(i!= 1){
+      tran_nesrece <- cbind(tran_zup, tran_nesrece)
+    }else{
+      tran_zup <- tran_nesrece[,1:2]
+    }
+    tran_nesrece <- ocisti_dataframe(tran_nesrece,14)
+    write.csv(tran_nesrece, paste("./data/processed data/transport broj",ifelse(j==1, "prometnih nesreća", "nastradalih u prometu"), tran_nesrece_imena[i]))
+  }
+}
+rm(tran_zup)
+rm(tran_nesrece)
+
+##TODO: 5.4.6. i 5.4.7. zračne luke, 5.4.8. registrirana vozila i 5.4.9. željeznički promet
+
+
+
+
+
+
+# Turizam.xlsx #############################
+#4.3.2.1. DOLASCI TURISTA U KOMERCIJALNIM SMJEŠTAJNIM OBJEKTIMA
+tur_sheet <- c("4.3.2.1.", "4.3.2.2.")
+tur_imena <- c("ukupno.csv", "domaći.csv", "strani.csv")
+for(j in c(1,2)){
+  for(i in seq(1,3)){
+    if(j == 2 && i == 3) break()
+    turizam_dolasci <- read.xlsx("./data/statistika u nizu/Turizam.xlsx", sheetName = tur_sheet[j],
+                                                     startRow=7, encoding = "UTF-8", endRow=30,
+                                                     colIndex = seq(ifelse(i==1, 1, ifelse(i==2, 26, 49)),
+                                                                    ifelse(i==1, 24, ifelse(i==2, 47, 70))),
+                                                     stringsAsFactors=F)
+    turizam_dolasci <- turizam_dolasci[-c(2),]
+    #Anotacije na 14. i 16. retku od naziva županija
+    if(i == 1){
+      turizam_dolasci[14,1:2] <- gsub("2)","",turizam_dolasci[14,1:2], fixed = T )
+      turizam_dolasci[16,1:2] <- gsub("2)","",turizam_dolasci[16,1:2], fixed = T )
+      tur_zup <- turizam_dolasci[,1:2]
+      names(turizam_dolasci) <- gsub(".1.","",names(turizam_dolasci), fixed = T )#anotacije na godinama 2001-2009
+      tur_nam <- names(turizam_dolasci)
+    }else{
+      turizam_dolasci <- cbind(tur_zup, turizam_dolasci)
+      names(turizam_dolasci) <- tur_nam
+    }
+    turizam_dolasci <- ocisti_dataframe(turizam_dolasci, 24)
+    write.csv(turizam_dolasci, paste("./data/processed data/turizam broj",ifelse(j==1, "dolazaka", "noćenja"), ifelse(i == 2 && j==2, tur_imena[i+1], tur_imena[i])))
+  }
+}
+rm(tur_nam)
+rm(tur_zup)
+rm(turizam_dolasci)
+
+#4.3.2.3. LUKE NAUTIČKOG TURIZMA
+tur_imena <- c("luka u nautičkom turizmu.csv", "plovila na stalnom vezu u lukama.csv", "plovila u tranzitu u lukama.csv")
+for(i in seq(1,3)){
+  tur_luke <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Turizam.xlsx", sheetName = "4.3.2.3.",
+                            startRow=7, encoding = "UTF-8", endRow=14,
+                            colIndex = seq( ifelse(i==1,1, ifelse(i==2,15,27)), ifelse(i==1,13, ifelse(i==2,25,37))),
+                            stringsAsFactors=F),ifelse(i==1,13,11))
+  if(i!= 1){
+    tur_luke <- cbind(tur_zup, tur_luke)
+  }else{
+    tur_zup <- tur_luke[,1:2]
+  }
+  write.csv(tur_luke, paste("./data/processed data/turizam broj", tur_imena[i]))
+}
+rm(tur_zup)
+rm(tur_luke)
