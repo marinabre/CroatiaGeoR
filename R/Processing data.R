@@ -225,9 +225,13 @@ for(i in seq(1,5)){
                           startRow=7, encoding = "UTF-8", endRow=29, 
                           colIndex = seq(1,25), 
                           stringsAsFactors=F),25)
+  if(i == 1)
+    kultura_names <- names(kultura)
+  names(kultura) <- kultura_names
   write.csv(kultura, paste("./data/processed data/kultura broj", kultura_podaci[i], ".csv"))
 }
 rm(kultura)
+rm(kultura_names)
 # Obrazovanje.xlsx ############################# 
 #prva tri sheeta - broj ustanova i broj djece okomito odvojeni, županije normalno raspisane
 #zadnja dva ukupno i redovni 1.4. -akademske godine, 1.5. - obične godine
@@ -247,6 +251,8 @@ for(i in c(1,2,3)){
   
   obrazovanje_djeca <- cbind(obrazovanje_ustanove[,1:2], obrazovanje_djeca)
   obrazovanje_djeca <- ocisti_dataframe(obrazovanje_djeca, 13)
+  names(obrazovanje_djeca)[-(1:2)] <- gsub('.{6}$', '', names(obrazovanje_djeca)[-(1:2)])
+  names(obrazovanje_ustanove)[-(1:2)] <- gsub('.{6}$', '', names(obrazovanje_ustanove)[-(1:2)])
   
   write.csv(obrazovanje_ustanove, paste("./data/processed data/obrazovanje", obrazovanje_podaci_1[i],"broj ustanova.csv"))
   write.csv(obrazovanje_djeca, paste("./data/processed data/obrazovanje", obrazovanje_podaci_1[i], "broj djece.csv"))
@@ -268,6 +274,11 @@ for(i in c(1,2)){
   
   obrazovanje_redovni <- cbind(obrazovanje_ukupno[,1:2], obrazovanje_redovni)
   obrazovanje_redovni <- ocisti_dataframe(obrazovanje_redovni, ifelse(i==1,22,23))
+  if(i == 1)
+  {#micanje akademskih godina, piše samo prva godina
+    names(obrazovanje_ukupno)[-(1:2)] <- gsub('.{6}$', '', names(obrazovanje_ukupno)[-(1:2)])
+    names(obrazovanje_redovni)[-(1:2)] <- gsub('.{6}$', '', names(obrazovanje_redovni)[-(1:2)])
+  }
   
   write.csv(obrazovanje_ukupno, paste("./data/processed data/obrazovanje ukupan broj", obrazovanje_podaci_2[i]))
   write.csv(obrazovanje_redovni, paste("./data/processed data/obrazovanje broj redovnih", obrazovanje_podaci_2[i]))
