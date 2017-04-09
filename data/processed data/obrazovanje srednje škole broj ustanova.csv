@@ -1,23 +1,12 @@
-"","Županija","County.of","2005.","2006.","2007.","2008.","2009.","2010.","2011.","2012.","2013.","2014.","2015."
-"1","Republika Hrvatska","Republic of Croatia",683,693,705,710,713,711,715,724,739,743,750
-"2","Zagrebaèka","Zagreb",32,33,33,33,33,33,33,33,33,33,34
-"3","Krapinsko-zagorska","Krapina-Zagorje",22,22,23,23,23,23,23,24,24,24,24
-"4","Sisaèko-moslavaèka","Sisak-Moslavina",29,28,28,29,29,29,29,29,29,29,29
-"5","Karlovaèka","Karlovac",27,27,27,26,26,26,27,27,27,28,28
-"6","Varaždinska","Varaždin",25,29,31,29,27,27,27,28,29,30,38
-"7","Koprivnièko-križevaèka","Koprivnica-Križevci",17,16,16,16,16,18,18,18,18,18,18
-"8","Bjelovarsko-bilogorska","Bjelovar-Bilogora",24,27,27,27,27,27,27,27,27,27,27
-"9","Primorsko-goranska","Primorje-Gorski kotar",52,53,55,57,57,57,57,58,59,58,58
-"10","Lièko-senjska","Lika-Senj",12,12,12,12,12,12,12,12,12,12,12
-"11","Virovitièko-podravska","Virovitica-Podravina",13,13,14,15,16,16,16,16,16,16,16
-"12","Požeško-slavonska","Požega-Slavonia",14,14,15,15,15,15,15,15,15,15,15
-"13","Brodsko-posavska","Slavonski Brod-Posavina",14,15,15,15,15,15,15,15,15,15,15
-"14","Zadarska","Zadar",34,35,36,36,36,35,35,35,35,35,36
-"15","Osjeèko-baranjska","Osijek-Baranja",54,54,53,53,53,53,53,52,52,52,52
-"16","Šibensko-kninska","Šibenik-Knin",20,20,23,23,23,22,22,22,22,22,22
-"17","Vukovarsko-srijemska","Vukovar-Sirmium",25,25,26,27,27,27,27,27,29,29,29
-"18","Splitsko-dalmatinska","Split-Dalmatia",80,80,80,82,86,85,85,88,91,92,91
-"19","Istarska","Istria",45,45,45,45,45,43,42,42,44,44,44
-"20","Dubrovaèko-neretvanska","Dubrovnik-Neretva",28,29,28,28,28,28,30,30,32,31,30
-"21","Meðimurska","Meðimurje",16,16,16,17,17,19,19,19,21,22,22
-"22","Grad Zagreb","City of Zagreb",100,100,102,102,102,101,103,107,109,111,110
+"","Republika Hrvatska","Zagrebaèka","Krapinsko-zagorska","Sisaèko-moslavaèka","Karlovaèka","Varaždinska","Koprivnièko-križevaèka","Bjelovarsko-bilogorska","Primorsko-goranska","Lièko-senjska","Virovitièko-podravska","Požeško-slavonska","Brodsko-posavska","Zadarska","Osjeèko-baranjska","Šibensko-kninska","Vukovarsko-srijemska","Splitsko-dalmatinska","Istarska","Dubrovaèko-neretvanska","Meðimurska","Grad Zagreb"
+"2005.",683,32,22,29,27,25,17,24,52,12,13,14,14,34,54,20,25,80,45,28,16,100
+"2006.",693,33,22,28,27,29,16,27,53,12,13,14,15,35,54,20,25,80,45,29,16,100
+"2007.",705,33,23,28,27,31,16,27,55,12,14,15,15,36,53,23,26,80,45,28,16,102
+"2008.",710,33,23,29,26,29,16,27,57,12,15,15,15,36,53,23,27,82,45,28,17,102
+"2009.",713,33,23,29,26,27,16,27,57,12,16,15,15,36,53,23,27,86,45,28,17,102
+"2010.",711,33,23,29,26,27,18,27,57,12,16,15,15,35,53,22,27,85,43,28,19,101
+"2011.",715,33,23,29,27,27,18,27,57,12,16,15,15,35,53,22,27,85,42,30,19,103
+"2012.",724,33,24,29,27,28,18,27,58,12,16,15,15,35,52,22,27,88,42,30,19,107
+"2013.",739,33,24,29,27,29,18,27,59,12,16,15,15,35,52,22,29,91,44,32,21,109
+"2014.",743,33,24,29,28,30,18,27,58,12,16,15,15,35,52,22,29,92,44,31,22,111
+"2015.",750,34,24,29,28,38,18,27,58,12,16,15,15,36,52,22,29,91,44,30,22,110

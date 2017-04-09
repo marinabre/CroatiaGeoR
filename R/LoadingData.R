@@ -1,5 +1,3 @@
-install.packages('tigris')
-library(tigris)
 
 install.packages('rgdal')
 library(rgdal)
@@ -62,22 +60,25 @@ ggplot(data.shape3.df) +
 # unique(natural$TYPE_1)
 
 
+data.shape3$LOCALNAME
+
+izvoz <- read.csv("./data/processed data/izvoz u tisucama eura.csv")
+izvoz$Županija
+
+# first remember the names
+n <- izvoz$Županija
+
+# transpose all but the first column (name)
+izvoz <- as.data.frame(t(izvoz[,-(1:3)]))
+colnames(izvoz) <- n
 
 
-stanovnistvo <- read.csv("./data/StanovnistvoPutovanjePoZupanijama.csv")
-stanovnistvo$X2014.Privatno.Putovanja.Inozemstvo.1.i.više.noćenja
 
-#uklanjanja riječi " županija" iz naziva županija
-stanovnistvo$Zupanija <- unlist(lapply(stanovnistvo$Zupanija, function(x) {
-  gsub(" županija", "", x)
-}))
-
-
-zupanije <- tbl_df(data.shape)
-glimpse(zupanije)
+zupanije <- tbl_df(data.shape3)
+glimpse(izvoz)
 
 ?join
-spojeno <- join(zupanije, stanovnistvo, by = zupanije$NAME_1)
+spojeno <- join(zupanije, izvoz, by = zupanije$LOCALNAME)
 ggplot(spojeno) + 
   aes(long,lat,group=group,fill=X2014.Privatno.Putovanja.Inozemstvo.1.i.više.noćenja) + 
   geom_polygon() +
