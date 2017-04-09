@@ -11,46 +11,45 @@ library(tidyverse)
 
 # zavod za ststistiku linkovi: http://www.dzs.hr/Hrv_Eng/Pokazatelji/Turizam.xlsx
 setCPLConfigOption("SHAPE_ENCODING", "")
-data.shape<- readOGR(dsn="C:/Users/Ivyclover/Dropbox/DIPLOMSKI/R skripte/data/Cro Admin Areas",
-                     layer="HRV_adm1", stringsAsFactors=FALSE, use_iconv=TRUE,
+data.shape<- readOGR(dsn="./data/exported_boundaries_Croatia",
+                     layer="Croatia_AL6", stringsAsFactors=FALSE, use_iconv=TRUE,
                      encoding="CP1252")
 setCPLConfigOption("SHAPE_ENCODING", NULL)
 
 #iconv(pt4$NAME_1, from="CP1252", to="UTF-8")
 
-plot(data.shape)
+plot(data.shape) 
 rownames(data.shape@data)
 summary(data.shape)
 glimpse(data.shape)
-unique(data.shape$NAME_1)
-
-data.shape$NAME_1 <- unlist(lapply(data.shape$NAME_1, function(x) {
-  gsub("c", "č", x)
-}))
-
-unique(data.shape$NAME_1)
-#ispravljanje tipfelera u podacima
-data.shape$NAME_1[1] <- "Bjelovarsko-Bilogorska"
+data.shape$LOCALNAME <- gsub("c", "č", data.shape$LOCALNAME)
+data.shape$LOCALNAME[is.na(data.shape$LOCALNAME)] <- "Međimurska"
+data.shape$LOCALNAME
 
 
 
+setCPLConfigOption("SHAPE_ENCODING", "")
+data.shape3<- readOGR(dsn="./data/exported_boundaries_Croatia",
+                     layer="Croatia_AL6", stringsAsFactors=FALSE, use_iconv=TRUE,
+                     encoding="CP1252")
+setCPLConfigOption("SHAPE_ENCODING", NULL)
+plot(data.shape3)
+rownames(data.shape3@data)
+data.shape3$LOCALNAME <- gsub("c", "č", data.shape3$LOCALNAME)
+data.shape3$LOCALNAME[is.na(data.shape3$LOCALNAME)] <- "Međimurska"
+data.shape3@data$id = rownames(data.shape3@data)
+data.shape3.points = fortify(data.shape3, region="id")
+data.shape3.df = join(data.shape3.points, data.shape3@data, by="id")
+summary(data.shape3)
+glimpse(data.shape3.df)
 
-# data.shape3<-readOGR(dsn="C:/Users/Ivyclover/Dropbox/DIPLOMSKI/R skripte/data/Cro Admin Areas",layer="HRV_adm2")
-# plot(data.shape3)
-# rownames(data.shape3@data)
-# data.shape3@data$id = rownames(data.shape3@data)
-# data.shape3.points = fortify(data.shape3, region="id")
-# data.shape3.df = join(data.shape3.points, data.shape3@data, by="id")
-# summary(data.shape3)
-# glimpse(data.shape3.df)
-# unique(data.shape3$TYPE_1)
-# 
-# ggplot(data.shape3.df) + 
-#   aes(long,lat,group=group,fill=NAME_1) + 
-#   geom_polygon() +
-#   geom_path(color="black") +
-#   coord_equal() +
-#   theme_bw()
+
+ggplot(data.shape3.df) +
+  aes(long,lat,group=group,fill=LOCALNAME) +
+  geom_polygon() +
+  geom_path(color="black") +
+  coord_equal() +
+  theme_bw()
 
 # natural<-readOGR(dsn="C:/Users/Ivyclover/Dropbox/DIPLOMSKI/croatia-latest.shp",layer="natural")
 # plot(natural)
