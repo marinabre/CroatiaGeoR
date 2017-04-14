@@ -8,23 +8,19 @@ library(tidyverse)
 
 
 # zavod za ststistiku linkovi: http://www.dzs.hr/Hrv_Eng/Pokazatelji/Turizam.xlsx
-setCPLConfigOption("SHAPE_ENCODING", "")
+
 data.shape<- readOGR(dsn="./data/exported_boundaries_Croatia",
                      layer="Croatia_AL6", stringsAsFactors=FALSE, use_iconv=TRUE,
                      encoding="CP1252")
-setCPLConfigOption("SHAPE_ENCODING", NULL)
 
-#iconv(pt4$NAME_1, from="CP1252", to="UTF-8")
-
-plot(data.shape) 
-rownames(data.shape@data)
-summary(data.shape)
-glimpse(data.shape)
 data.shape$LOCALNAME <- gsub("c", "č", data.shape$LOCALNAME)
-data.shape$LOCALNAME[is.na(data.shape$LOCALNAME)] <- "Međimurska"
+data.shape$LOCALNAME[data.shape$LOCALNAME == "Medimurska"] <- "Međimurska"
 data.shape$LOCALNAME
+data.shape <-  data.shape[order(data.shape$LOCALNAME),]
+writePolyShape(data.shape, "Croatia_AL6")
+writeOGR(data.shape, dsn = "./data/map", layer = "Croatia_AL6", driver="ESRI Shapefile", overwrite_layer = T)
 
-
+####
 
 setCPLConfigOption("SHAPE_ENCODING", "")
 data.shape3<- readOGR(dsn="./data/exported_boundaries_Croatia",
