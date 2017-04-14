@@ -35,9 +35,9 @@ server <- function(input, output, session) {
   })
     
   output$mymap <- renderLeaflet({
-    leaflet(data = dat_source(), options = leafletOptions(minZoom = 7, maxZoom = 10)) %>% addTiles() %>%
-      setView(zoom = 7, lng = 17, lat=44) %>%
-      fitBounds(lat1=42, lng1=15, lat2=46, lng2=20) %>%
+    leaflet(data = dat_source(), options = leafletOptions(minZoom = 5, maxZoom = 10)) %>%
+      setView(zoom = 7, lng = 15, lat=43) %>%
+      fitBounds(lat1=42, lng1=10, lat2=46, lng2=18) %>%
       addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
                   opacity = 1.0, fillOpacity = 0.5, fillColor = ~colorpal()(odabrana_godina()),
                   label = ~paste0(LOCALNAME, ": ", formatC(odabrana_godina(), big.mark = ".", decimal.mark=",")),

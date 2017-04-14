@@ -24,7 +24,7 @@ body <- dashboardBody(
               selectInput("izvor", "Izvor podataka", lista_izvora, selected = "./data/transport broj prometnih nesreca ukupno.csv"),
               div(class="outer",
                   tags$style(type = "text/css", ".outer {position: fixed; top: 150px; left: 0; right: 0; bottom: 0; overflow: hidden; padding: 0, margin: 0 auto;}"),
-                  leafletOutput("mymap", width = "100%", height = "90%")
+                  leafletOutput("mymap", width = "100%", height = "95%")
                   ),
               absolutePanel(top = 50, right = 10,
                             selectInput("colors", "Color Scheme",
