@@ -99,7 +99,7 @@ ukupno_izdanih_dozvola <- read.xlsx("./data/statistika u nizu/Gradevinarstvo.xls
 #visak je "zupanija" nakon naziva svake zupanije
 #zadnji red umjesto "Bez lokacije zupanije2)"	Unclassified2) popraviti na "Nerasporedeno" radi konzistentnosti
 
-ukupno_izdanih_dozvola[23,1] <- "Nerasporedeno"
+ukupno_izdanih_dozvola[23,1] <- "Neraspoređeno"
 ukupno_izdanih_dozvola[23,2] <- "Unclassified"
 ukupno_izdanih_dozvola <- ocisti_dataframe(ukupno_izdanih_dozvola, 16)
 write.csv((ukupno_izdanih_dozvola), "./shiny-app/data/grad ukupno izdanih gradevinskih dozvola.csv", row.names=FALSE)

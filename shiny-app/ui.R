@@ -4,9 +4,10 @@ header <- dashboardHeader(title = "Analiza statistike RH")
 sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
-    menuItem("Podaci na karti RH", tabName = "kartaRH", icon = icon("map")),
-    menuItem("Pojedina županija", tabName = "zupanija", icon = icon("location-arrow")),
-    menuItem("Podaci prikazani grafom", tabName = "grafRH", icon = icon("bar-chart")),
+    menuItem("Podaci na karti RH", tabName = "mapCRO", icon = icon("map")),
+    menuItem("Pojedina županija", tabName = "countyCRO", icon = icon("location-arrow")),
+    menuItem("Podaci prikazani grafom", tabName = "graphCRO", icon = icon("bar-chart")),
+    selectInput("file_source", "Izvor podataka", source_files, selected = source_files[1]),
     menuItem("Unos vlastitih podataka", tabName = "upload", icon = icon("cloud-upload"))
   )
 )
@@ -19,31 +20,36 @@ body <- dashboardBody(
             p("opis moje aplikacije")
     ),
     # First tab content
-    tabItem(tabName = "kartaRH",
-            fluidRow(
-              selectInput("izvor", "Izvor podataka", lista_izvora, selected = "./data/transport broj prometnih nesreca ukupno.csv"),
-              div(class="outer",
-                  tags$style(type = "text/css", ".outer {position: fixed; top: 150px; left: 0; right: 0; bottom: 0; overflow: hidden; padding: 0, margin: 0 auto;}"),
-                  leafletOutput("mymap", width = "100%", height = "95%")
-                  ),
-              absolutePanel(top = 50, right = 10,
-                            selectInput("colors", "Color Scheme",
-                                        rownames(subset(brewer.pal.info, category %in% c("seq", "div"))), selected = "Reds"
-                            ),
-                            selectInput("godine", "Godine podataka",
-                                        inicijalne_godine, selected = "X2014.")
-              )
-            )
-            
+    tabItem(tabName = "mapCRO",
+      fluidPage(
+        div(class="outer",
+          tags$style(type = "text/css", ".outer {position: fixed; top: 7%; left: 15%; right: 0; bottom: 0; overflow: hidden; padding: 0, margin: 0 auto;}"),
+          leafletOutput("mymap", width = "100%", height = "95%")
+        ),
+        absolutePanel(top = 50, right = 10,
+                      selectInput("colors", "Color Scheme",
+                                  rownames(subset(brewer.pal.info, category %in% c("seq", "div"))), selected = "Reds"
+                      ),
+                      selectInput("years", "Godine podataka",
+                                  initial_years, selected = tail(initial_years,1))
+        )
+      )
     ),
     
     # Second tab content
-    tabItem(tabName = "zupanija",
-            h2("Županija brrrm")
+    tabItem(tabName = "countyCRO",
+      fluidPage(
+        h1("Podaci o županiji kroz godine"),
+        selectInput("counties", "Odabir županije",
+                    counties_list, selected = counties_list[2]
+        )
+        
+        
+      )
     ),
     
     # Third tab content
-    tabItem(tabName = "grafRH",
+    tabItem(tabName = "graphCRO",
             h2("Grafićiiiii")
     ),
     # Fourth tab content

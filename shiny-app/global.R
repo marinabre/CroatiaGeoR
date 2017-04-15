@@ -1,12 +1,13 @@
 
 
-lista_izvora <-list.files(path = "./data", pattern = "*.csv", all.files = T,
+source_files <-list.files(path = "./data", pattern = "*.csv", all.files = T,
              full.names = T, recursive = FALSE)
   
-zupanije_RH <- readOGR(dsn="./data",
+counties_RH <- readOGR(dsn="./data",
                  layer="Croatia_AL6", stringsAsFactors=FALSE, encoding = "UTF-8")
   
-  
-inicijalne_godine <- names(read.csv("./data/transport broj prometnih nesreca ukupno.csv", stringsAsFactors = F))[-(1:2)]
+initial_data <- read.csv(source_files[1], stringsAsFactors = F)
+initial_years <- names(initial_data)[-(1:2)]
+counties_list <- initial_data[,1]
 
 #  legenda_textovi <- scan("./data/Legenda.txt", what="", sep="\n", encoding = "UTF-8")
