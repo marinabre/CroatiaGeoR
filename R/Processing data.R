@@ -6,7 +6,7 @@ require(xlsx)
 ocisti_dataframe <- function(df,br_stupaca){
   df[df == "-"] <- NA
   df[,3:br_stupaca] <- sapply(df[,3:br_stupaca], function(x){as.numeric(gsub(' ', '',x))})
-  df[,1] <- trimws(gsub(" zupanija","",df[,1]))
+  df[,1] <- trimws(gsub(" županija","",df[,1]))
   df[,2] <- trimws(df[,2])
   names(df) <- gsub('X', '',names(df))
   rownames(df) <- NULL
@@ -86,7 +86,7 @@ for(j in c(1,2)){
       names(bdp) <- bdp_names
       }
     bdp <- (ocisti_dataframe(bdp, 17))
-    write.csv(bdp, paste("./shiny-app/data/bdp ",ifelse(j==1,"","po stanovniku")," u tisucama ", ifelse(i==1, "kuna", "eura"), ".csv", sep = ""), row.names=FALSE)
+    write.csv(bdp, paste("./shiny-app/data/bdp BDP ",ifelse(j==1,"","po stanovniku")," u tisucama ", ifelse(i==1, "kuna", "eura"), ".csv", sep = ""), row.names=FALSE)
   }
 }
 
@@ -180,7 +180,7 @@ for(i in c(1,2)){
   vel_zgrada <- cbind(ukupno_velicina_zavrsenih_zgrada[,1:2], vel_zgrada)
   names(vel_zgrada) <- names(ukupno_velicina_zavrsenih_zgrada)
   vel_zgrada <- (ocisti_dataframe(vel_zgrada, 30))
-  write.csv(vel_zgrada, paste("./shiny-app/data/grad", gradevina_drugi_sheet[i+1], "(zavrsenih) zgrada za koje su izdane gradevinske dozvole.csv"))
+  write.csv(vel_zgrada, paste("./shiny-app/data/grad", gradevina_drugi_sheet[i+1], "(zavrsenih) zgrada za koje su izdane gradevinske dozvole.csv"), row.names=FALSE)
 }
 rm(vel_zgrada)
 ## 3.2.5. - ZAVRsENI STANOVI 
@@ -224,6 +224,7 @@ industrija <- (ocisti_dataframe(read.xlsx("./data/statistika u nizu/Industrija.x
                                                                 startRow=9, encoding = "UTF-8", endRow=32, 
                                                                 colIndex = seq(1,15), 
                                                                 stringsAsFactors=F), 13))
+industrija[4,1] <- "Sisačko-moslavačka"
 write.csv(industrija, "./shiny-app/data/industrija ukupna vrijednost prodanih proizvoda po NP-u.csv", row.names=FALSE)
 
 
@@ -359,8 +360,10 @@ for(i in seq(1,22)){
   for(j in seq(1,5))    pom[j,][1:2] <- trimws(gsub(".", " ",names(pom)[1:2], fixed = TRUE))
   
   #nedostaju - u imenima zupanija (jer su bili u names pa im je R zamijenio s .), no grad zagreb i RH ne trebaju -
-  pom[,1][2:5] <- gsub(" ", "-",pom[,1][2:5])
-  
+  if(pom[,1][1] != "Grad Zagreb" && pom[,1][1] != "Republika Hrvatska")
+  {
+    pom[,1] <- gsub(" ", "-",pom[,1])
+  }
   #imena moraju biti konzistentna kako bi se moglo dodati na kraj dataframea
   names(pom) <- names(stanovnistvo_names)
   st_zivorodeni <- bind_rows(st_zivorodeni, pom[1,])
@@ -407,7 +410,10 @@ for(i in seq(1,22)){
   for(j in seq(1,7))    pom[j,][1:2] <- trimws(gsub(".", " ",names(pom)[1:2], fixed = TRUE))
   
   #nedostaju - u imenima zupanija (jer su bili u names pa im je R zamijenio s .), no grad zagreb i RH ne trebaju -
-  pom[,1][2:7] <- gsub(" ", "-",pom[,1][2:7])
+  if(pom[,1][1] != "Grad Zagreb" && pom[,1][1] != "Republika Hrvatska")
+  {
+    pom[,1] <- gsub(" ", "-",pom[,1])
+  }
 
   #imena moraju biti konzistentna kako bi se moglo dodati na kraj dataframea
   names(pom) <- names(stanovnistvo_names)

@@ -1,23 +1,23 @@
 "Županija","County.of","2002.","2003.","2004.","2005.","2006.","2007.","2008.","2009.","2010.","2011.","2012.","2013.","2014.","2015."
 "Republika Hrvatska","Republic of Croatia",4451,4695,4685,5158,6013,7242,6859,5012,4017,2920,2795,2626,1871,1995
-"Zagrebaèka županija","Zagreb",306,210,189,500,264,228,247,166,226,136,257,135,77,105
-"Krapinsko-zagorska županija","Krapina-Zagorje",47,59,48,53,40,32,46,74,77,61,32,19,17,37
-"Sisaèko-moslavaèka županija","Sisak-Moslavina",228,156,105,73,64,62,92,100,100,77,76,82,45,16
-"Karlovaèka županija","Karlovac",98,73,52,60,157,61,101,51,36,26,31,65,57,31
-"Varaždinska županija","Varaždin",81,103,127,274,87,372,160,157,172,76,109,187,126,38
-"Koprivnièko-križevaèka županija","Koprivnica-Križevci",33,41,65,55,43,131,48,27,43,72,27,25,36,59
-"Bjelovarsko-bilogorska županija","Bjelovar-Bilogora",73,107,76,65,52,97,99,108,100,34,49,25,53,27
-"Primorsko-goranska županija","Primorje-Gorski kotar",441,584,552,587,810,891,755,598,426,415,387,420,281,186
-"Lièko-senjska županija","Lika-Senj",71,94,141,102,79,79,301,197,67,123,76,46,77,96
-"Virovitièko-podravska županija","Virovitica-Podravina",30,36,73,55,55,40,57,37,55,33,31,14,10,4
-"Požeško-slavonska županija","Požega-Slavonia",99,160,202,54,88,43,66,36,33,49,22,9,30,16
-"Brodsko-posavska županija","Slavonski Brod-Posavina",82,77,103,76,74,70,106,110,97,81,51,81,37,19
-"Zadarska županija","Zadar",197,184,261,305,215,216,240,214,220,208,241,171,163,216
-"Osjeèko-baranjska županija","Osijek-Baranja",233,152,137,142,257,299,358,193,171,103,98,92,130,59
-"Šibensko-kninska županija","Šibenik-Knin",181,153,152,173,335,272,121,68,105,94,99,126,63,97
-"Vukovarsko-srijemska županija","Vukovar-Sirmium",466,236,202,138,127,125,96,186,123,116,78,126,46,104
-"Splitsko-dalmatinska županija","Split-Dalmatia",315,401,423,415,582,680,697,561,334,215,244,305,185,142
-"Istarska županija","Istria",351,439,344,477,405,476,413,345,308,217,183,202,148,112
-"Dubrovaèko-neretvanska županija","Dubrovnik-Neretva",119,140,231,186,173,199,150,88,146,150,125,116,57,72
-"Meðimurska županija","Meðimurje",39,51,23,22,39,43,39,62,59,25,19,29,52,25
+"Zagrebaèka","Zagreb",306,210,189,500,264,228,247,166,226,136,257,135,77,105
+"Krapinsko-zagorska","Krapina-Zagorje",47,59,48,53,40,32,46,74,77,61,32,19,17,37
+"Sisaèko-moslavaèka","Sisak-Moslavina",228,156,105,73,64,62,92,100,100,77,76,82,45,16
+"Karlovaèka","Karlovac",98,73,52,60,157,61,101,51,36,26,31,65,57,31
+"Varaždinska","Varaždin",81,103,127,274,87,372,160,157,172,76,109,187,126,38
+"Koprivnièko-križevaèka","Koprivnica-Križevci",33,41,65,55,43,131,48,27,43,72,27,25,36,59
+"Bjelovarsko-bilogorska","Bjelovar-Bilogora",73,107,76,65,52,97,99,108,100,34,49,25,53,27
+"Primorsko-goranska","Primorje-Gorski kotar",441,584,552,587,810,891,755,598,426,415,387,420,281,186
+"Lièko-senjska","Lika-Senj",71,94,141,102,79,79,301,197,67,123,76,46,77,96
+"Virovitièko-podravska","Virovitica-Podravina",30,36,73,55,55,40,57,37,55,33,31,14,10,4
+"Požeško-slavonska","Požega-Slavonia",99,160,202,54,88,43,66,36,33,49,22,9,30,16
+"Brodsko-posavska","Slavonski Brod-Posavina",82,77,103,76,74,70,106,110,97,81,51,81,37,19
+"Zadarska","Zadar",197,184,261,305,215,216,240,214,220,208,241,171,163,216
+"Osjeèko-baranjska","Osijek-Baranja",233,152,137,142,257,299,358,193,171,103,98,92,130,59
+"Šibensko-kninska","Šibenik-Knin",181,153,152,173,335,272,121,68,105,94,99,126,63,97
+"Vukovarsko-srijemska","Vukovar-Sirmium",466,236,202,138,127,125,96,186,123,116,78,126,46,104
+"Splitsko-dalmatinska","Split-Dalmatia",315,401,423,415,582,680,697,561,334,215,244,305,185,142
+"Istarska","Istria",351,439,344,477,405,476,413,345,308,217,183,202,148,112
+"Dubrovaèko-neretvanska","Dubrovnik-Neretva",119,140,231,186,173,199,150,88,146,150,125,116,57,72
+"Meðimurska","Meðimurje",39,51,23,22,39,43,39,62,59,25,19,29,52,25
 "Grad Zagreb","City of Zagreb",961,1239,1179,1346,2067,2826,2667,1634,1119,609,560,351,181,534
