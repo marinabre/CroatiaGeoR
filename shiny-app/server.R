@@ -49,27 +49,27 @@ server <- function(input, output, session) {
   })
   
   observe({
-    
     change <- input$izvor
-    
+    updated <- F
     if(change != "./data/transport broj prometnih nesreca ukupno.csv"){
-      
       updateSelectInput(session, "godine",
                         label = "Godine podataka",
-                        choices = names(podaci_input())[-(1:2)], selected = "X2014."
+                        choices = names(podaci_input())[-(1:2)], selected = grep("X2014.*", names(podaci_input())[-(1:2)], value = T)[1]
       )
+      updated<-T
     }
-    data <- dat_source()
-    leafletProxy("mymap", data = data)  %>% clearControls() %>% clearShapes() %>%
-      addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                  opacity = 1.0, fillOpacity = 0.5, fillColor = ~colorpal()(odabrana_godina()),
-                  label = ~paste0(LOCALNAME, ": ", formatC(odabrana_godina(), big.mark = ".", decimal.mark=",")),
-                  highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                      bringToFront = TRUE)) %>%
-      addLegend(position = "bottomright", pal = colorpal(), 
-                values = ~log10(odabrana_godina()), title=legend_title(), 
-                opacity = 1.0, labFormat = labelFormat(transform = function(x) round(10^x)))
-    
-  })
+    if(!updated){
+      data <- dat_source()
+      leafletProxy("mymap", data = data)  %>% clearControls() %>% clearShapes() %>%
+        addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+                    opacity = 1.0, fillOpacity = 0.5, fillColor = ~colorpal()(odabrana_godina()),
+                    label = ~paste0(LOCALNAME, ": ", formatC(odabrana_godina(), big.mark = ".", decimal.mark=",")),
+                    highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                        bringToFront = TRUE)) %>%
+        addLegend(position = "bottomright", pal = colorpal(), 
+                  values = ~log10(odabrana_godina()), title=legend_title(), 
+                  opacity = 1.0, labFormat = labelFormat(transform = function(x) round(10^x)))
+    }
+    })
   
 }
