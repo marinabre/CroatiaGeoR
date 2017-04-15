@@ -1,0 +1,94 @@
+﻿BDP u tisućama eura u
+BDP u tisućama kuna u
+BDP po stanovniku (tis. eura) u
+BDP po stanovniku (tis. kuna) u
+1-sobni završeni stanovi za koje su izdane građevinske dozvole u
+2-sobni završeni stanovi za koje su izdane građevinske dozvole u
+3-sobni završeni stanovi za koje su izdane građevinske dozvole u
+4-sobni završeni stanovi za koje su izdane građevinske dozvole u
+5-sobni i visešobni završeni stanovi za koje su izdane građevinske dozvole u
+Broj stanova za koje su izdane građevinske dozvole u
+Izdane građevinske dozvole za ostale gradevine u
+Izdane građevinske dozvole za zgrade u
+Korisna površina (m2) stanova za koje su izdane građevinske dozvole u
+Ukupna veličina završenih zgrada za koje su izdane građevinske dozvole 
+Ukupna veličina zgrada za koje su izdane građevinske dozvole u
+Ukupna vrijednost za koje su izdane građevinske dozvole u
+Ukupni broj završenih stanova za koje su izdane građevinske dozvole u
+Ukupno izdanih gradevinskih dozvola u
+Veličina nestambenih (završenih) zgrada za koje su izdane građevinske dozvole u
+Veličina nestambenih zgrada za koje su izdane građevinske dozvole u
+Veličina stambenih (završenih) zgrada za koje su izdane građevinske dozvole u
+Veličina stambenih zgrada za koje su izdane građevinske dozvole u
+Vrijednost cjevovoda, komunikacijskih i električnih vodova za koje su izdane građevinske dozvole u
+Vrijednost nestambenih zgrada za koje su izdane građevinske dozvole u
+Vrijednost ostalih nespomenutih gradevina za koje su izdane građevinske dozvole u
+Vrijednost prometne infrakstrukture za koje su izdane građevinske dozvole u
+Vrijednost složenih gradevina na industrijskim prostorima za koje su izdane građevinske dozvole u
+Vrijednost stambenih zgrada za koje su izdane građevinske dozvole u
+Industrija ukupna vrijednost prodanih proizvoda po NP-u u
+Izvoz u tisućama eura u
+Izvoz u tisućama kuna u
+Broj kina u
+Broj posjetitelja u kinima u
+Broj radiopretplatnika u
+Broj sjedala u kinima u
+Broj tv pretplatnika u
+Broj redovnih studenata koji su završili u
+Broj redovnih upisanih studenata u
+Dječji vrtici broj djece u
+Dječji vrtici broj ustanova u
+Osnovne škole broj djece u
+Osnovne škole broj ustanova u
+Srednje škole broj djece u
+Srednje škole broj ustanova u
+Ukupan broj studenata koji su završili u
+Ukupan broj upisanih studenata u
+Broj broj doseljenih iz druge države u
+Broj doseljenih iz druge županije u
+Broj doseljenih u
+Broj odseljenih u drugu državu u
+Broj odseljenih u drugu županiju u
+Broj odseljenih u
+Broj razvedenih brakova u
+Broj sklopljenih brakova u
+Broj umrlih u
+Broj živorodenih u
+Prirodni prirast u
+Procjena br st sredinom godine u
+Saldo migracije s inozemstvom u
+Broj nastradalih u prometu s ozlijeđenim osobama u
+Broj nastradalih u prometu s poginulim osobama u
+Ukupni broj nastradalih u prometu u
+Broj prometnih nesreća s ozlijedenim osobama u
+Broj prometnih nesreća s poginulim osobama u
+Ukupni broj prometnih nesreća u
+Cestovni prijevoz robe u
+Gustoća cestovne mreže u
+Ukupni broj autocesta u
+Ukupni broj cestovnih mreža u
+Ukupni broj drzavnih cesta u
+Ukupni broj lokalnih cesta u
+Ukupni broj županijskih cesta u
+Broj dolazaka domaći u
+Broj dolazaka strani u
+Ukupni broj dolazaka u
+Broj luka u nautičkom turizmu u
+Broj noćenja strani u
+Ukupni broj noćenja u
+Broj plovila na stalnom vezu u lukama u
+Broj plovila u tranzitu u lukama u
+Uvoz u tisućama eura u
+Uvoz u tisućama kuna u
+Aktivni osiguranici-individualni poljoprivrednici u
+Zaposlenost aktivno stanovništvo u
+Bruto plaće u
+Neto plaće u
+Nezaposleni u
+Stopa registrirane nezaposlenosti u
+Ukupno zaposleni u
+Zaposleni u obrtu i slobodnim profesijama u
+Zaposleni u pravnim osobama u
+Zaštita okoliša investicije u
+Zaštita okoliša prihodi u
+Zaštita okoliša tekući izdaci u

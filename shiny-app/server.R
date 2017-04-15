@@ -31,7 +31,7 @@ server <- function(input, output, session) {
   })
   
   legend_title <- reactive({
-    paste("Ukupni broj prometnih nesreća u", godina_text()) 
+    paste(legenda_textovi[match(input$izvor, lista_izvora)], godina_text()) 
   })
     
   output$mymap <- renderLeaflet({

@@ -6,3 +6,4 @@
   
   
   inicijalne_godine <- names(read.csv("./data/transport broj prometnih nesreca ukupno.csv", stringsAsFactors = F))[-(1:2)]
+  legenda_textovi <- scan("./data/Legenda.txt", what="", sep="\n", encoding = "UTF-8")

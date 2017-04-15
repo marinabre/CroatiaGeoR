@@ -34,7 +34,7 @@ izvoz <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx",
 
 # ako zelimo ukloniti samo  prva dva prazna retka, izvoz[-seq(1,3), ] ako zelimo ukloniti i podatke za cijelu drzavu
 izvoz <- izvoz[-c(1,2), ]
-names(izvoz)[1] <- "zupanija"
+names(izvoz)[1] <- "Županija"
 names(izvoz)[2] <- "County.of"
 #u xlsx fileu 2016 ima footnote koji se u Ru ispisuje kao "X2016.1............."
 names(izvoz)[19] <- "X2016."
@@ -443,8 +443,8 @@ write.csv((stanovnistvo_procjena), "./shiny-app/data/stanovnistvo procjena br st
 tran_cestovna <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.1.",
                                    startRow=9, encoding = "UTF-8", endRow=32,
                                    colIndex = seq(1,13),
-                                   stringsAsFactors=F), 13)
-tran_cestovna <- tran_cestovna[-c(2),]
+                                   stringsAsFactors=F)[-c(2),], 13)
+tran_cestovna[4,1] <- "Sisačko-moslavačka" #ispravljanje tipfelera
 write.csv((tran_cestovna), "./shiny-app/data/transport ukupni broj cestovnih mreza.csv", row.names=FALSE)
 
 #4
@@ -454,8 +454,7 @@ for(i in seq(1,4)){
   tran_ceste <- read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.1.",
                              startRow=9, encoding = "UTF-8", endRow=32,
                              colIndex = seq(tran_stupci[i],tran_stupci[i]+10), 
-                             stringsAsFactors=F)
-  tran_ceste <- tran_ceste[-c(2),]
+                             stringsAsFactors=F)[-c(2),]
   ##autoceste nemaju vrijednost u prva dva stupca, a R odbija prepoznati "..."
   if(i == 1){
     tran_ceste[1:2] <-NA
@@ -465,18 +464,18 @@ for(i in seq(1,4)){
 }
 rm(tran_ceste)
 
-tran_gustoca <- read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.2.",
+tran_gustoca <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.2.",
                                             startRow=8, encoding = "UTF-8", endRow=31,
                                             colIndex = seq(1,13),
-                                            stringsAsFactors=F)
-tran_gustoca <- (ocisti_dataframe(tran_gustoca[-c(2),], 13))
+                                            stringsAsFactors=F)[-c(2),], 13)
+tran_gustoca[4,1] <- "Sisačko-moslavačka" #ispravljanje tipfelera
 write.csv(tran_gustoca, "./shiny-app/data/transport gustoca cestovne mreze.csv", row.names=FALSE)
 
-tran_prijevoz_robe <- read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.3.",
+tran_prijevoz_robe <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.3.",
                                            startRow=9, encoding = "UTF-8", endRow=32,
                                            colIndex = seq(1,17),
-                                           stringsAsFactors=F)
-tran_prijevoz_robe <- (ocisti_dataframe(tran_prijevoz_robe[-c(2),], 17))
+                                           stringsAsFactors=F)[-c(2),], 17)
+tran_prijevoz_robe[4,1] <- "Sisačko-moslavačka" #ispravljanje tipfelera
 write.csv(tran_prijevoz_robe, "./shiny-app/data/transport cestovni prijevoz robe.csv", row.names=FALSE)
 
 tran_nesrece_imena <- c("ukupno.csv", "s poginulim osobama.csv", "s ozlijedenim osobama.csv")
@@ -500,7 +499,8 @@ for (j in c(1,2)){
                                                      stringsAsFactors=F)
     tran_nesrece <- tran_nesrece[-c(2),]
     if(i== 1){
-      tran_nesrece$Policijska.uprava[2] <- "Zagrebacka"
+      tran_nesrece$Policijska.uprava[2] <- "Zagrebačka"
+      tran_nesrece$Policijska.uprava[4] <- "Sisačko-moslavačka" #ispravljanje tipfelera
       tran_zup <- tran_nesrece[,1:2]
     }else{
       tran_nesrece <- cbind(tran_zup, tran_nesrece)
@@ -574,7 +574,11 @@ zaposlenost <- function(sheet, br_podataka, imena, pocetni_red, zadnji_stupac){
   zap1 <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Zaposlenost i place.xlsx", sheetName = sheet,
                                     startRow=pocetni_red, encoding = "UTF-8", endRow=pocetni_red+22,
                                     colIndex = seq(1,zadnji_stupac), stringsAsFactors=F),zadnji_stupac)
+  
+  zap1[4,1] <- "Sisačko-moslavačka" #ispravljanje tipfelera
   write.csv((zap1), paste("./shiny-app/data/zaposlenost ", imena[1], ".csv", sep=""), row.names=FALSE)
+  
+  
   if(br_podataka > 1){
     zap2 <- read.xlsx("./data/statistika u nizu/Zaposlenost i place.xlsx", sheetName = sheet,
                                        startRow=7, encoding = "UTF-8", endRow=29,
