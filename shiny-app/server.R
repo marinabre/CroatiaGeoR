@@ -1,12 +1,10 @@
 
 
 server <- function(input, output, session) {
-  source("global.R")
+  #source("global.R")
 
   podaci_input <- reactive({
     podaci <- read.csv(input$izvor, stringsAsFactors = F)
-    #izbacivanje RH
-    podaci <- podaci[-1,]
     names(podaci)[1] <- "LOCALNAME"
     podaci <- podaci[order(podaci$LOCALNAME),]
     rownames(podaci) <- NULL
@@ -31,7 +29,9 @@ server <- function(input, output, session) {
   })
   
   legend_title <- reactive({
-    paste(legenda_textovi[match(input$izvor, lista_izvora)], godina_text()) 
+    text <- paste(gsub(".csv", "", gsub("./data/[a-zA-z]* ", "", input$izvor)), godina_text())
+    #prvo slovo veliko
+    paste0(toupper(substr(text, 1, 1)), substr(text, 2, nchar(text)))
   })
     
   output$mymap <- renderLeaflet({
