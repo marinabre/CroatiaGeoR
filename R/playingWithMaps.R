@@ -213,3 +213,10 @@ ggplot(data = mergano, # the input data
         axis.title = element_blank(), # remove axis titles
         axis.ticks = element_blank()) # remove axis ticks
 # ggsave("figure/facet_london.png", width = 9, height = 9) # save figure
+
+
+prirast <- read.csv("./shiny-app/data/stanovnistvo prirodni prirast.csv", stringsAsFactors = F)[,-2]
+#prirast <- prirast[-1,]
+prirast_tdy <- gather(subset(prirast, Županija =="Grad Zagreb" | Županija == "Republika Hrvatska"), godina, pop, -Županija)
+
+ggplot(subset(prirast_tdy, Županija =="Grad Zagreb"), aes(x = godina, y = pop, fill = Županija)) + geom_bar(stat = "identity")

@@ -10,6 +10,28 @@ server <- function(input, output, session) {
     rownames(new_data) <- NULL
     new_data
   })
+  
+  plot_input <- reactive({
+    temp <- gather(data_input(), year, shown_data, -LOCALNAME, -County.of)
+    temp$year <- gsub("X", "", temp$year)
+    temp
+  })
+  
+  plot_input_county <- reactive({
+    subset(plot_input(), LOCALNAME == input$counties)
+  })
+  
+  plot_input_CRO_and_county <- reactive({
+    subset(plot_input(), LOCALNAME == input$counties | LOCALNAME == "Republika Hrvatska")
+  })
+  
+  pie_plot_input <- reactive ({
+    subset(plot_input(), LOCALNAME != "Republika Hrvatska" & year == gsub("X", "", input$years2))
+  })
+  
+  chosen_county <- reactive({
+    match(input$counties, data_input()[,1])
+  })
     
     
   dat_source <- reactive({
@@ -28,8 +50,16 @@ server <- function(input, output, session) {
     gsub("X", "", input$years)
   })
   
+  data_y_label <- reactive({
+    gsub(".csv", "", gsub("./data/[a-zA-Z]* ", "", input$file_source))
+  })
+  
+  pie_plot_legend <- reactive({
+    text <- paste(data_y_label(), gsub("X", "", input$years2))
+  })
+  
   legend_title <- reactive({
-    text <- paste(gsub(".csv", "", gsub("./data/[a-zA-Z]* ", "", input$file_source)), year_text())
+    text <- paste(data_y_label(), year_text())
     #prvo slovo veliko
     paste0(toupper(substr(text, 1, 1)), substr(text, 2, nchar(text)))
   })
@@ -48,10 +78,51 @@ server <- function(input, output, session) {
                 opacity = 1.0, labFormat = labelFormat(transform = function(x) round(10^x)))
   })
   
+  output$barPlot <- renderPlotly({
+      ggplot(plot_input_county(), aes(x = year, y = shown_data, fill = LOCALNAME)) + 
+      geom_bar(stat = "identity")+
+      labs(x = "Godina", y = data_y_label(), fill = "Županija")+
+      theme(axis.text.x = element_text(angle = 90))
+    })
+  
+  output$linePlot <- renderPlotly({
+    ggplot(plot_input_CRO_and_county(), aes(x = year, y = shown_data, color=LOCALNAME, group = LOCALNAME))  + 
+      geom_line()+ 
+      geom_point()+
+      labs(x = "Godina", y = data_y_label(), col = "Županija")+
+      theme(axis.text.x = element_text(angle = 90))
+  })
+  
+  output$event <- renderPrint({
+    d <- event_data("plotly_hover")
+  })
+  
+  output$piePlot <- renderPlotly({
+    plot_ly(pie_plot_input(), labels = ~LOCALNAME, values = ~shown_data, type = 'pie',
+            textposition = 'inside',
+            textinfo = 'label+percent',
+            insidetextfont = list(color = '#FFFFFF'),
+            #hoverinfo = 'text',
+            #text = ~paste('$', shown_data, ' billions'),
+            marker = list(colors = colors,
+                          line = list(color = '#FFFFFF', width = 1)),
+            #The 'pull' attribute can also be used to create space between the sectors
+            showlegend = FALSE) %>%
+      layout(title = pie_plot_legend(),
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+  })
+  
+  
+  #?theme
   observe({
     updated <- F
     if(input$file_source != source_files[1]){
       updateSelectInput(session, "years",
+                        label = "Godine podataka",
+                        choices = names(data_input())[-(1:2)], selected = tail(names(data_input())[-(1:2)], 1)
+      )
+      updateSelectInput(session, "years2",
                         label = "Godine podataka",
                         choices = names(data_input())[-(1:2)], selected = tail(names(data_input())[-(1:2)], 1)
       )

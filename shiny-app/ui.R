@@ -39,10 +39,28 @@ body <- dashboardBody(
     # Second tab content
     tabItem(tabName = "countyCRO",
       fluidPage(
-        h1("Podaci o županiji kroz godine"),
-        selectInput("counties", "Odabir županije",
-                    counties_list, selected = counties_list[2]
-        )#,
+        fluidRow(
+          h1("Podaci o županiji kroz godine"),
+          selectInput("counties", "Odabir županije",
+                      counties_list, selected = counties_list[2]
+          )
+        ),
+        fluidRow(
+          column(6,
+            plotlyOutput("barPlot")
+          ),
+          column(6,
+            plotlyOutput("linePlot"),
+            verbatimTextOutput("event")
+          )
+        ),
+        fluidRow(
+          column(6,
+            selectInput("years2", "Godine podataka",
+                        initial_years, selected = tail(initial_years,1)),
+            plotlyOutput("piePlot")
+          )
+        )
         #faceted graf kroz godine
         
         
