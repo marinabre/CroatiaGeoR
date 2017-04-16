@@ -42,7 +42,8 @@ body <- dashboardBody(
         h1("Podaci o županiji kroz godine"),
         selectInput("counties", "Odabir županije",
                     counties_list, selected = counties_list[2]
-        )
+        )#,
+        #faceted graf kroz godine
         
         
       )
