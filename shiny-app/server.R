@@ -1,10 +1,25 @@
+# if (!require('shiny')) install.packages("shiny")
+# if (!require('shinydashboard')) install.packages("shinydashboard")
+# if (!require('leaflet')) install.packages("leaflet")
+# if (!require('rgdal')) install.packages("rgdal") 
+# if (!require('ggplot2')) install.packages("ggplot2")
+# if (!require('magrittr')) install.packages("magrittr") 
+# if (!require('plotly')) install.packages("plotly")
 
+library(shiny)
+library(shinydashboard)
+library(magrittr)
+library(tidyr)
+library(leaflet)
+library(ggplot2)
+library(plotly)
+
+#source("Global.R")
 
 server <- function(input, output, session) {
-  #source("global.R")
 
   data_input <- reactive({
-    new_data <- read.csv(input$file_source, stringsAsFactors = F)
+    new_data <- read.csv(input$file_source, stringsAsFactors = F, encoding = "UTF-8")
     names(new_data)[1] <- "LOCALNAME"
     #new_data <- new_data[order(new_data$LOCALNAME),]
     rownames(new_data) <- NULL
@@ -17,8 +32,12 @@ server <- function(input, output, session) {
     temp
   })
   
-  plot_input_county <- reactive({
+  plot_input_county_data <- reactive({
     subset(plot_input(), LOCALNAME == input$counties)
+  })
+  
+  plot_input_county <- reactive({
+    subset(counties_RH, LOCALNAME == input$counties)
   })
   
   plot_input_CRO_and_county <- reactive({
@@ -29,10 +48,14 @@ server <- function(input, output, session) {
     subset(plot_input(), LOCALNAME != "Republika Hrvatska" & year == gsub("X", "", input$years2))
   })
   
+  county_multiple_input <- reactive({
+    subset(plot_input(), LOCALNAME %in% input$counties_multiple)
+  })
+  
+  
   chosen_county <- reactive({
     match(input$counties, data_input()[,1])
   })
-    
     
   dat_source <- reactive({
     merge(counties_RH, data_input(), by="LOCALNAME")
@@ -43,7 +66,7 @@ server <- function(input, output, session) {
   })
   
   chosen_year <- reactive({
-    dat_source()@data[,input$years]
+    dat_source()[,input$years]
   })
   
   year_text <- reactive({
@@ -63,9 +86,17 @@ server <- function(input, output, session) {
     #prvo slovo veliko
     paste0(toupper(substr(text, 1, 1)), substr(text, 2, nchar(text)))
   })
-    
+  
+  output$countyPlot <- renderLeaflet({
+      leaflet(data = plot_input_county()) %>%
+        addTiles(options = tileOptions(minZoom = 7, maxZoom = 12)) %>%
+        addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+                    opacity = 1.0, fillOpacity = 0.3, label = ~LOCALNAME)
+      
+    })
+
   output$mymap <- renderLeaflet({
-    leaflet(data = dat_source(), options = leafletOptions(minZoom = 5, maxZoom = 10)) %>%
+    leaflet(data = dat_source(), options = leafletOptions(minZoom = 7, maxZoom = 9)) %>%
       #setView(zoom = 7, lng = 15, lat=43) %>%
       #fitBounds(lat1=42, lng1=10, lat2=46, lng2=18) %>%
       addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
@@ -79,10 +110,11 @@ server <- function(input, output, session) {
   })
   
   output$barPlot <- renderPlotly({
-      ggplot(plot_input_county(), aes(x = year, y = shown_data, fill = LOCALNAME)) + 
+      ggplot(plot_input_county_data(), aes(x = year, y = shown_data, fill = LOCALNAME)) + 
       geom_bar(stat = "identity")+
       labs(x = "Godina", y = data_y_label(), fill = "Županija")+
-      theme(axis.text.x = element_text(angle = 90))
+      theme(axis.text.x = element_text(angle = 90)) +
+      theme_bw()
     })
   
   output$linePlot <- renderPlotly({
@@ -90,7 +122,8 @@ server <- function(input, output, session) {
       geom_line()+ 
       geom_point()+
       labs(x = "Godina", y = data_y_label(), col = "Županija")+
-      theme(axis.text.x = element_text(angle = 90))
+      theme(axis.text.x = element_text(angle = 90)) +
+      theme_bw()
   })
   
   output$event <- renderPrint({
@@ -102,8 +135,6 @@ server <- function(input, output, session) {
             textposition = 'inside',
             textinfo = 'label+percent',
             insidetextfont = list(color = '#FFFFFF'),
-            #hoverinfo = 'text',
-            #text = ~paste('$', shown_data, ' billions'),
             marker = list(colors = colors,
                           line = list(color = '#FFFFFF', width = 1)),
             #The 'pull' attribute can also be used to create space between the sectors
@@ -112,6 +143,16 @@ server <- function(input, output, session) {
              xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
              yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
   })
+  
+  output$linePlot_multiple <- renderPlotly({
+    ggplot(county_multiple_input(), aes(x = year, y = shown_data, color=LOCALNAME, group = LOCALNAME))  + 
+      geom_line()+ 
+      geom_point()+
+      labs(x = "Godina", y = data_y_label(), col = "Županija")+
+      theme(axis.text.x = element_text(angle = 90)) +
+      theme_bw()
+  })
+  
   
   
   #?theme
@@ -128,7 +169,11 @@ server <- function(input, output, session) {
       )
       updateSelectInput(session, "counties",
                         label = "Odabir županije",
-                        choices = data_input()[,1], selected = data_input()[,1][1]
+                        choices = data_input()[,1], selected = data_input()[,1][2]
+      )
+      updateSelectInput(session, "counties_multiple",
+                        label = "Odabir županija za prikaz",
+                        choices = data_input()[,1], selected = data_input()[,1][2]
       )
       updated <- T
     }
@@ -144,6 +189,11 @@ server <- function(input, output, session) {
                   values = ~log10(chosen_year()), title=legend_title(), 
                   opacity = 1.0, labFormat = labelFormat(transform = function(x) round(10^x)))
     }
+    
+    leafletProxy("countyPlot", data = plot_input_county()) %>%
+      clearShapes() %>%
+      addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+                  opacity = 1.0, fillOpacity = 0.3, label = ~LOCALNAME)
+    
     })
-  
 }

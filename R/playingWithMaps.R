@@ -220,3 +220,35 @@ prirast <- read.csv("./shiny-app/data/stanovnistvo prirodni prirast.csv", string
 prirast_tdy <- gather(subset(prirast, Županija =="Grad Zagreb" | Županija == "Republika Hrvatska"), godina, pop, -Županija)
 
 ggplot(subset(prirast_tdy, Županija =="Grad Zagreb"), aes(x = godina, y = pop, fill = Županija)) + geom_bar(stat = "identity")
+
+
+
+
+
+setCPLConfigOption("SHAPE_ENCODING", "") #neccesary so that the croatian symbols don't get squashed
+counties_RH <- readOGR(dsn="./shiny-app/data",
+                       layer="Croatia_AL7", stringsAsFactors=F, use_iconv=T, encoding = "UTF-8")
+
+prirast <- read.csv("./shiny-app/data/stanovnistvo prirodni prirast.csv", stringsAsFactors = F, encoding = "UTF-8")[,-2]
+names(prirast)[1] <- "LOCALNAME"
+dat_source <- merge(counties_RH, prirast, by="LOCALNAME")
+
+
+class(dat_source@data[,"X2015."])
+
+class(prirast[,"X2015."])
+
+
+
+
+prirast_tdy <- gather(prirast[-seq(1:15),], godina, pop, -Županija)
+
+prirast_tdy$godina <- as.numeric(gsub("X", "", prirast_tdy$godina))
+
+ggplot(prirast_tdy, aes(godina,pop , color = Županija, group= Županija)) + geom_point(na.rm = T, alpha = 0.6) +
+  geom_line()+ 
+  labs(x = "Godina", y = "prirodni prirast", "Županija" ) 
+
+
+
+

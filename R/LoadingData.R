@@ -6,21 +6,54 @@ require("ggplot2")
 require("plyr")
 library(tidyverse)
 
-
+setwd(getSrcDirectory()[1])
 # zavod za ststistiku linkovi: http://www.dzs.hr/Hrv_Eng/Pokazatelji/Turizam.xlsx
+iconv(NULL, "CP1250", "UTF-8")
+setCPLConfigOption("SHAPE_ENCODING", "")
+data.shape<- readOGR(dsn="./shiny-app/data",
+                     layer="Croatia_AL7", stringsAsFactors=F, use_iconv=T,
+                     encoding="UTF-8")
 
-data.shape<- readOGR(dsn="./data/exported_boundaries_Croatia",
-                     layer="Croatia_AL6", stringsAsFactors=FALSE, use_iconv=TRUE,
-                     encoding="CP1252")
+data.shape$LOCALNAME
+
+?iconv
+iconv(NULL, "CP1252", "UTF-8")
+drops <- c("ADMIN_LVL", "CITY_KEY", "REGION_KEY", "NOTE","FLAG","CURRENCY",
+           "ISO1","ISO2","WIKIPEDIA", "OFF_NAME", "TAGS")
+data.shape@data <- data.shape@data[,!(names(data.shape@data) %in% drops)]
+data.shape$LOCALNAME <- gsub("č", "c", data.shape$LOCALNAME)
+data.shape$LOCALNAME[data.shape$LOCALNAME == "Međimurska"] <- "Medimurska"
+
+
+names(data.shape@data)
 
 data.shape$LOCALNAME <- gsub("c", "č", data.shape$LOCALNAME)
 data.shape$LOCALNAME[data.shape$LOCALNAME == "Medimurska"] <- "Međimurska"
 data.shape$LOCALNAME
 data.shape <-  data.shape[order(data.shape$LOCALNAME),]
-writePolyShape(data.shape, "Croatia_AL6")
-writeOGR(data.shape, dsn = "./data/map", layer = "Croatia_AL6", driver="ESRI Shapefile", overwrite_layer = T)
-
+writePolyShape(data.shape, "Croatia_AL7")
+writeOGR(data.shape, dsn = "./data/map", layer = "Croatia_AL7", driver="ESRI Shapefile", overwrite_layer = T, encoding = "UTF-8")
+?writeOGR
 ####
+
+
+
+data.shape<- readOGR(dsn="./shiny-app/data",
+                     layer="Croatia_AL6", stringsAsFactors=F, use_iconv=T,
+                     encoding="CP1250")
+
+data.shape$LOCALNAME
+
+
+
+
+
+
+
+
+
+
+
 
 setCPLConfigOption("SHAPE_ENCODING", "")
 data.shape3<- readOGR(dsn="./data/exported_boundaries_Croatia",
