@@ -32,7 +32,9 @@ body <- dashboardBody(
     # Main tab
     tabItem(tabName = "dashboard",
             h1("Moja aplikacija"),
-            p("opis moje aplikacije")
+            p("Danas je dostupno sve više relevantnih podataka vezanih uz različite geografske lokacije, odnosno područja, u Republici Hrvatskoj. Primjeri tih podataka su bruto domaći proizvod ostvaren u određenim vremenskim razdobljima  u različitim županijama, zatim podaci vezani uz različite gospodarske aktivnosti, populaciju, obrazovanje, okoliš i drugo. Kako bi se na osnovu dostupnih podataka mogle donositi što bolje odluke, odnosno, podatke što bolje razumjeti, važno je podatke prikazati na vizualno primjeren način. S druge strane, 
+              danas postoje programski jezici koji omogućuju naprednu analizu i obradu podataka. 
+              Vaš je zadatak istražiti mogućnosti odabranog programskog jezika za statističko programiranje te implementirati funkcionalnost koja će omogućiti prikaz podataka vezanih uz određena područja Republike Hrvatske. Za određene primjere dostupnih podataka potrebno je predložiti te prikazati adekvatan i prihvatljiv način vizualizacije.")
     ),
     # First tab content
     tabItem(tabName = "mapCRO",

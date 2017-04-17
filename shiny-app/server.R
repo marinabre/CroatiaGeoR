@@ -113,8 +113,8 @@ server <- function(input, output, session) {
       ggplot(plot_input_county_data(), aes(x = year, y = shown_data, fill = LOCALNAME)) + 
       geom_bar(stat = "identity")+
       labs(x = "Godina", y = data_y_label(), fill = "Županija")+
-      theme(axis.text.x = element_text(angle = 90))+
-      theme_bw()
+      theme_bw()+
+      theme(axis.text.x = element_text(angle = 90))
     })
   
   output$linePlot <- renderPlotly({
@@ -122,8 +122,9 @@ server <- function(input, output, session) {
       geom_line()+ 
       geom_point()+
       labs(x = "Godina", y = data_y_label(), col = "Županija")+
-      theme(axis.text.x = element_text(angle = 90))+
-      theme_bw()
+      theme_bw() +
+      theme(axis.text.x = element_text(angle = 90))
+      
   })
   
   output$event <- renderPrint({
