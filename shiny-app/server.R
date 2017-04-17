@@ -156,8 +156,8 @@ server <- function(input, output, session) {
   
   #?theme
   observe({
-    updated <- F
-    if(input$file_source != source_files[1]){
+    #updated <- F
+    #if(input$file_source != source_files[1]){
       updateSelectInput(session, "years",
                         label = "Godine podataka",
                         choices = names(data_input())[-(1:2)], selected = tail(names(data_input())[-(1:2)], 1)
@@ -175,27 +175,20 @@ server <- function(input, output, session) {
                         choices = data_input()[,1], selected = data_input()[,1][2]
       )
       updated <- T
-    }
-    if(!updated){
-      new_data <- dat_source()
-      leafletProxy("mymap", data = new_data)  %>% clearControls() %>% clearShapes() %>%
-        addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                    opacity = 1.0, fillOpacity = 0.5, fillColor = ~colorpal()(chosen_year()),
-                    label = ~paste0(LOCALNAME, ": ", formatC(chosen_year(), big.mark = ".", decimal.mark=",")),
-                    highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                        bringToFront = TRUE)) %>%
-        addLegend(position = "bottomright", pal = colorpal(), 
-                  values = ~log10(chosen_year()), title=legend_title(), 
-                  opacity = 1.0, labFormat = labelFormat(transform = function(x) round(10^x)))
-    }
-    
-    leafletProxy("countyPlot", data = plot_input_county()) %>%
-      clearShapes() %>%
-      addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                  opacity = 1.0, fillOpacity = 0.3, label = ~LOCALNAME)
+    #}
+    # if(!updated){
+    #   new_data <- dat_source()
+    #   leafletProxy("mymap", data = new_data)  %>% clearControls() %>% clearShapes() %>%
+    #     addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+    #                 opacity = 1.0, fillOpacity = 0.5, fillColor = ~colorpal()(chosen_year()),
+    #                 label = ~paste0(LOCALNAME, ": ", formatC(chosen_year(), big.mark = ".", decimal.mark=",")),
+    #                 highlightOptions = highlightOptions(color = "white", weight = 2,
+    #                                                     bringToFront = TRUE)) %>%
+    #     addLegend(position = "bottomright", pal = colorpal(), 
+    #               values = ~log10(chosen_year()), title=legend_title(), 
+    #               opacity = 1.0, labFormat = labelFormat(transform = function(x) round(10^x)))
+    # }
     
     
-    
-    
-    })
+   })
 }
