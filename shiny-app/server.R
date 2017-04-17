@@ -50,8 +50,8 @@ server <- function(input, output, session) {
   
   county_multiple_input <- reactive({
     subset(plot_input(), LOCALNAME %in% input$counties_multiple)
+    
   })
-  
   
   chosen_county <- reactive({
     match(input$counties, data_input()[,1])
@@ -66,7 +66,7 @@ server <- function(input, output, session) {
   })
   
   chosen_year <- reactive({
-    dat_source()[,input$years]
+    dat_source()@data[,input$years]
   })
   
   year_text <- reactive({
@@ -113,7 +113,7 @@ server <- function(input, output, session) {
       ggplot(plot_input_county_data(), aes(x = year, y = shown_data, fill = LOCALNAME)) + 
       geom_bar(stat = "identity")+
       labs(x = "Godina", y = data_y_label(), fill = "Županija")+
-      theme(axis.text.x = element_text(angle = 90)) +
+      theme(axis.text.x = element_text(angle = 90))+
       theme_bw()
     })
   
@@ -122,7 +122,7 @@ server <- function(input, output, session) {
       geom_line()+ 
       geom_point()+
       labs(x = "Godina", y = data_y_label(), col = "Županija")+
-      theme(axis.text.x = element_text(angle = 90)) +
+      theme(axis.text.x = element_text(angle = 90))+
       theme_bw()
   })
   
@@ -152,7 +152,6 @@ server <- function(input, output, session) {
       theme(axis.text.x = element_text(angle = 90)) +
       theme_bw()
   })
-  
   
   
   #?theme
@@ -194,6 +193,9 @@ server <- function(input, output, session) {
       clearShapes() %>%
       addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
                   opacity = 1.0, fillOpacity = 0.3, label = ~LOCALNAME)
+    
+    
+    
     
     })
 }
