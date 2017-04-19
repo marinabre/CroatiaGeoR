@@ -18,8 +18,20 @@ library(plotly)
 
 server <- function(input, output, session) {
 
+  output$show_warning <- output$show_warning1 <- output$show_warning2 <- renderUI({
+    inFile <- input$file1
+    tags$h3(class="warning",tags$style(type = "text/css", ".warning {color: red; position: relative; z-index:1000;}"), 
+                ifelse(! is.null(inFile),paste("Prikazani podaci su iz učitane datoteke: \"", inFile$name, "\"!", sep=""), ""))
+  })
+  
   data_input <- reactive({
-    new_data <- read.csv(input$file_source, stringsAsFactors = F, encoding = "UTF-8")
+    inFile <- input$file1
+    if(! is.null(inFile)){
+      new_data <- read.csv(inFile$datapath, header=input$header, sep=input$sep, 
+               quote=input$quote, stringsAsFactors = F, encoding = "UTF-8")
+    }else{
+      new_data <- read.csv(input$file_source, stringsAsFactors = F, encoding = "UTF-8")
+    }
     names(new_data)[1] <- "LOCALNAME"
     #new_data <- new_data[order(new_data$LOCALNAME),]
     rownames(new_data) <- NULL
@@ -73,8 +85,17 @@ server <- function(input, output, session) {
     gsub("X", "", input$years)
   })
   
+  file_name <- reactive({
+    inFile <- input$file1
+    if(! is.null(inFile)){
+      inFile$name
+    }else{
+      input$file_source
+    }
+  })
+  
   data_y_label <- reactive({
-    gsub(".csv", "", gsub("./data/[a-zA-Z]* ", "", input$file_source))
+    gsub(".csv", "", gsub("./data/[a-zA-Z]* ", "", file_name()))
   })
   
   pie_plot_legend <- reactive({
