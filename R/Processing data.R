@@ -103,7 +103,7 @@ ukupno_izdanih_dozvola <- read.xlsx("./data/statistika u nizu/Gradevinarstvo.xls
 ukupno_izdanih_dozvola[23,1] <- "Neraspoređeno"
 ukupno_izdanih_dozvola[23,2] <- "Unclassified"
 ukupno_izdanih_dozvola <- ocisti_dataframe(ukupno_izdanih_dozvola, 16)
-write.csv((ukupno_izdanih_dozvola), "./shiny-app/data/grad ukupno izdanih gradevinskih dozvola.csv", row.names=FALSE, fileEncoding = "UTF-8")
+write.csv((ukupno_izdanih_dozvola), "./shiny-app/data/grad ukupno izdanih grad dozvola.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
 gradevina_stupci <- c(1, 18, 33, 48, 63, 78, 93)
 gradevina_prvi_sheet <- c("za zgrade.csv", "za ostale gradevine.csv")
@@ -117,7 +117,7 @@ for(i in c(1,2)){
                              stringsAsFactors=F), 14)
   
   sobni_stanovi <- (cbind(grad_zupanije_Unclassified, sobni_stanovi))
-  write.csv(sobni_stanovi, paste("./shiny-app/data/grad izdane gradevinske dozvole", gradevina_prvi_sheet[i]), row.names=FALSE, fileEncoding = "UTF-8")
+  write.csv(sobni_stanovi, paste("./shiny-app/data/grad izdane grad dozvole", gradevina_prvi_sheet[i]), row.names=FALSE, fileEncoding = "UTF-8")
 }
 rm(sobni_stanovi)
 
@@ -134,7 +134,7 @@ for(i in c(1,2,3)){
   }else{
     gradevina_zupanije <- sobni_stanovi[,1:2]
   }
-  write.csv((sobni_stanovi), paste("./shiny-app/data/grad", gradevina_drugi_sheet[i], "zgrada za koje su izdane gradevinske dozvole.csv"), row.names=FALSE, fileEncoding = "UTF-8")
+  write.csv((sobni_stanovi), paste("./shiny-app/data/grad", gradevina_drugi_sheet[i], "zgrada s izdanom grad dozvolom.csv"), row.names=FALSE, fileEncoding = "UTF-8")
 }
 rm(sobni_stanovi)
 
@@ -148,7 +148,7 @@ for(i in c(1,2)){
   
   if(i !=1) sobni_stanovi <- cbind(gradevina_zupanije, sobni_stanovi)
   
-  write.csv((sobni_stanovi), paste("./shiny-app/data/grad", gradevina_treci_sheet[i], "za koje su izdane gradevinske dozvole.csv"), row.names=FALSE, fileEncoding = "UTF-8")
+  write.csv((sobni_stanovi), paste("./shiny-app/data/grad", gradevina_treci_sheet[i], "s izdanom grad dozvolom.csv"), row.names=FALSE, fileEncoding = "UTF-8")
 }
 rm(sobni_stanovi)
 
@@ -170,7 +170,7 @@ names(ukupno_velicina_zavrsenih_zgrada)[c(TRUE, FALSE)][-1] <- paste(names(ukupn
 ukupno_velicina_zavrsenih_zgrada <- ukupno_velicina_zavrsenih_zgrada[-c(1), ]
 ukupno_velicina_zavrsenih_zgrada <- ocisti_dataframe(ukupno_velicina_zavrsenih_zgrada, 30)
 
-write.csv((ukupno_velicina_zavrsenih_zgrada), "./shiny-app/data/grad ukupna velicina zavrsenih zgrada za koje su izdane gradevinske dozvole.csv", row.names=FALSE, fileEncoding = "UTF-8")
+write.csv((ukupno_velicina_zavrsenih_zgrada), "./shiny-app/data/grad ukupna velicina zavrsenih zgrada s izdanom grad dozvolom.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
 for(i in c(1,2)){
   vel_zgrada <- read.xlsx("./data/statistika u nizu/Gradevinarstvo.xlsx", sheetName ="3.2.4.", 
@@ -181,7 +181,7 @@ for(i in c(1,2)){
   vel_zgrada <- cbind(ukupno_velicina_zavrsenih_zgrada[,1:2], vel_zgrada)
   names(vel_zgrada) <- names(ukupno_velicina_zavrsenih_zgrada)
   vel_zgrada <- (ocisti_dataframe(vel_zgrada, 30))
-  write.csv(vel_zgrada, paste("./shiny-app/data/grad", gradevina_drugi_sheet[i+1], "(zavrsenih) zgrada za koje su izdane gradevinske dozvole.csv"), row.names=FALSE, fileEncoding = "UTF-8")
+  write.csv(vel_zgrada, paste("./shiny-app/data/grad", gradevina_drugi_sheet[i+1], "(zavrsenih) zgrada s izdanom grad dozvolom.csv"), row.names=FALSE, fileEncoding = "UTF-8")
 }
 rm(vel_zgrada)
 ## 3.2.5. - ZAVRsENI STANOVI 
@@ -190,7 +190,7 @@ zavrseni_stanovi <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Gradevi
                               colIndex = seq(1,30), stringsAsFactors=F), 30)
 
 names(zavrseni_stanovi) <- names(ukupno_velicina_zavrsenih_zgrada)
-write.csv((zavrseni_stanovi), paste("./shiny-app/data/grad ukupni broj zavrsenih stanova za koje su izdane gradevinske dozvole.csv"), row.names=FALSE, fileEncoding = "UTF-8")
+write.csv((zavrseni_stanovi), paste("./shiny-app/data/grad ukupni broj zavrsenih stanova s izdanom grad dozvolom.csv"), row.names=FALSE, fileEncoding = "UTF-8")
 
 
 ## 3.2.6. - ZAVRsENI STANOVI PREMA BROJU SOBA
@@ -206,7 +206,7 @@ grad_fja_obrada <- function(brojIteracija, sheet, pocetniRed, krajnjiRed, zupani
       sobni_stanovi[,1] <- zupanija[,1]
     }
     sobni_stanovi <- (ocisti_dataframe(sobni_stanovi, 15))
-    write.csv(sobni_stanovi, paste("./shiny-app/data/grad", sheetImena[i], "za koje su izdane gradevinske dozvole.csv"), row.names=FALSE, fileEncoding = "UTF-8")
+    write.csv(sobni_stanovi, paste("./shiny-app/data/grad", sheetImena[i], "s izdanom grad dozvolom.csv"), row.names=FALSE, fileEncoding = "UTF-8")
   }
 }
 gradevina_sesti_sheet <- c("1-sobni zavrseni stanovi", "2-sobni zavrseni stanovi", "3-sobni zavrseni stanovi", "4-sobni zavrseni stanovi", "5-sobni i visesobni zavrseni stanovi")
@@ -314,6 +314,7 @@ for(i in c(1,2,3)){
   if(i != 1){
     okolis <- cbind(okolis_zupanije, okolis)
   }else{
+    okolis[4,1] <- "Sisačko-moslavačka" #ispravljanje tipfelera
     okolis_zupanije <- okolis[,1:2]
   }
   names(okolis)[10] <- "X2015." #micanje anotacije
