@@ -1,23 +1,23 @@
 "Županija","County.of","2002.","2003.","2004.","2005.","2006.","2007.","2008.","2009.","2010.","2011.","2012.","2013.","2014.","2015."
-"Republika Hrvatska","Republic of Croatia",3955,3309,3335,2559,3043,3267,3451,2536,1632,1462,1735,1065,675,"835"
-"Zagrebačka","Zagreb",93,58,47,90,77,39,29,57,34,14,20,17,9,"16"
-"Krapinsko-zagorska","Krapina-Zagorje",6,12,12,17,18,17,31,12,7,14,26,1,6,"4"
-"Sisačko-moslavačka","Sisak-Moslavina",508,333,132,7,39,11,16,11,14,30,19,8,7,"7"
-"Karlovačka","Karlovac",154,117,122,19,74,38,31,14,22,38,28,22,17,"11"
-"Varaždinska","Varaždin",22,19,24,2,15,3,9,16,7,16,5,7,7,"2"
-"Koprivničko-križevačka","Koprivnica-Križevci",7,17,27,15,10,27,16,16,11,18,1,NA,2,"13"
-"Bjelovarsko-bilogorska","Bjelovar-Bilogora",42,48,48,25,38,35,11,52,15,3,13,4,7,"10"
-"Primorsko-goranska","Primorje-Gorski kotar",300,286,235,332,291,373,306,332,196,190,185,207,90,"54"
-"Ličko-senjska","Lika-Senj",201,205,238,26,81,42,67,30,20,57,27,20,58,"25"
-"Virovitičko-podravska","Virovitica-Podravina",24,40,68,16,27,25,22,8,3,5,2,2,NA,"3"
+"Republika Hrvatska","Republic of Croatia",3955,3309,3335,2559,3043,3267,3451,2536,1632,1462,1735,1065,675,835
+"Zagrebačka","Zagreb",93,58,47,90,77,39,29,57,34,14,20,17,9,16
+"Krapinsko-zagorska","Krapina-Zagorje",6,12,12,17,18,17,31,12,7,14,26,1,6,4
+"Sisačko-moslavačka","Sisak-Moslavina",508,333,132,7,39,11,16,11,14,30,19,8,7,7
+"Karlovačka","Karlovac",154,117,122,19,74,38,31,14,22,38,28,22,17,11
+"Varaždinska","Varaždin",22,19,24,2,15,3,9,16,7,16,5,7,7,2
+"Koprivničko-križevačka","Koprivnica-Križevci",7,17,27,15,10,27,16,16,11,18,1,NA,2,13
+"Bjelovarsko-bilogorska","Bjelovar-Bilogora",42,48,48,25,38,35,11,52,15,3,13,4,7,10
+"Primorsko-goranska","Primorje-Gorski kotar",300,286,235,332,291,373,306,332,196,190,185,207,90,54
+"Ličko-senjska","Lika-Senj",201,205,238,26,81,42,67,30,20,57,27,20,58,25
+"Virovitičko-podravska","Virovitica-Podravina",24,40,68,16,27,25,22,8,3,5,2,2,NA,3
 "Požeško-slavonska","Požega-Slavonia",42,200,233,12,49,15,24,NA,3,25,6,NA,3,NA
-"Brodsko-posavska","Slavonski Brod-Posavina",45,96,42,7,28,12,10,20,17,11,8,19,4,"2"
-"Zadarska","Zadar",218,288,277,215,273,241,360,268,182,182,284,110,108,"135"
-"Osječko-baranjska","Osijek-Baranja",330,135,161,82,239,182,217,83,119,61,49,64,63,"19"
-"Šibensko-kninska","Šibenik-Knin",198,211,101,88,231,226,139,53,35,38,37,21,13,"26"
-"Vukovarsko-srijemska","Vukovar-Sirmium",816,315,125,38,16,36,38,59,38,15,33,30,18,"3"
-"Splitsko-dalmatinska","Split-Dalmatia",277,253,662,561,510,639,570,661,286,294,147,188,121,"173"
-"Istarska","Istria",171,222,191,324,217,302,333,284,143,95,71,115,57,"42"
-"Dubrovačko-neretvanska","Dubrovnik-Neretva",62,82,131,112,109,119,81,82,64,83,72,61,17,"11"
-"Međimurska","Međimurje",7,11,NA,1,4,3,20,11,NA,3,2,2,20,"6"
-"Grad Zagreb","City of Zagreb",432,361,459,570,697,882,1121,467,416,270,700,167,48,"273"
+"Brodsko-posavska","Slavonski Brod-Posavina",45,96,42,7,28,12,10,20,17,11,8,19,4,2
+"Zadarska","Zadar",218,288,277,215,273,241,360,268,182,182,284,110,108,135
+"Osječko-baranjska","Osijek-Baranja",330,135,161,82,239,182,217,83,119,61,49,64,63,19
+"Šibensko-kninska","Šibenik-Knin",198,211,101,88,231,226,139,53,35,38,37,21,13,26
+"Vukovarsko-srijemska","Vukovar-Sirmium",816,315,125,38,16,36,38,59,38,15,33,30,18,3
+"Splitsko-dalmatinska","Split-Dalmatia",277,253,662,561,510,639,570,661,286,294,147,188,121,173
+"Istarska","Istria",171,222,191,324,217,302,333,284,143,95,71,115,57,42
+"Dubrovačko-neretvanska","Dubrovnik-Neretva",62,82,131,112,109,119,81,82,64,83,72,61,17,11
+"Međimurska","Međimurje",7,11,NA,1,4,3,20,11,NA,3,2,2,20,6
+"Grad Zagreb","City of Zagreb",432,361,459,570,697,882,1121,467,416,270,700,167,48,273

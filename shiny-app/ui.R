@@ -88,6 +88,7 @@ body <- dashboardBody(
     tabItem(tabName = "graphCRO",
             h2("Podaci prikazani kroz različite vrste grafova"),
             uiOutput("show_warning2"),
+            uiOutput("show_warning3"),
             fluidRow(
               column(5,
                 selectInput("years2", "Godine podataka",

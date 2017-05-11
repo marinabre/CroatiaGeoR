@@ -117,7 +117,7 @@ rh_nesrece@data[,"X2004."]
 
 ##faceted data plots
 
-podaci <- read.csv("./shiny-app/data/stanovnistvo procjena br st sredinom godine.csv", stringsAsFactors = F)
+podaci <- read.csv("./shiny-app/data/stanovnistvo procjena br st sredinom godine.csv", stringsAsFactors = F, encoding = "UTF-8")
 
 names(podaci)[1] <- "LOCALNAME"
 podaci <- podaci[order(podaci$LOCALNAME),]
@@ -159,19 +159,20 @@ library(tidyr) # if not install it, or skip the next two steps
 ltidy <- gather(london_data, date, pop, -Area.Code, -Area.Name)
 head(ltidy, 2) # check the output (not shown)
 
-podaci <- read.csv("./shiny-app/data/stanovnistvo prirodni prirast.csv", stringsAsFactors = F)[,-2]
-ptidy <- gather(podaci, godina, pop, -Županija, -County.of)
+podaci <- read.csv("./shiny-app/data/stanovnistvo prirodni prirast.csv", stringsAsFactors = F, encoding = "UTF-8")[-1,-2]
+ptidy <- gather(podaci, godina, pop, -Županija)
 ptidy$godina <- gsub(".", "", gsub("X", "",ptidy$godina), fixed = T)
 names(ptidy)[1] <- "LOCALNAME"
-
+ptidy2 <- ptidy[order(ptidy$LOCALNAME),] 
 
 karta <- counties_RH
 karta@data$id = rownames(karta@data)
 karta.points = fortify(karta, region="id")
 karta.df = join(karta.points, karta@data, by="id")
 
-
-mergano <- left_join(karta.df, ptidy, by="LOCALNAME")
+unique(karta$LOCALNAME)
+unique(ptidy$LOCALNAME)
+mergano <- left_join(karta.df, ptidy2, by="LOCALNAME")
 
 ggplot(data = mergano, # the input data
        aes(x = long, y = lat, fill = pop, group = group)) + # define variables
@@ -190,7 +191,7 @@ ggplot(data = mergano, # the input data
 
 
 
-prirast <- read.csv("./shiny-app/data/stanovnistvo prirodni prirast.csv", stringsAsFactors = F)[,-2]
+prirast <- read.csv("./shiny-app/data/stanovnistvo prirodni prirast.csv", stringsAsFactors = F, encoding = "UTF-8")[,-2]
 prirast_tdy <- gather(prirast, godina, pop, -Županija)
 migracija <- read.csv("./shiny-app/data/stanovnistvo saldo migracije s inozemstvom.csv", stringsAsFactors = F) [,-2]
 migracija_tdy <- gather(migracija, godina, pop, -Županija)
@@ -215,7 +216,7 @@ ggplot(data = mergano, # the input data
 # ggsave("figure/facet_london.png", width = 9, height = 9) # save figure
 
 
-prirast <- read.csv("./shiny-app/data/stanovnistvo prirodni prirast.csv", stringsAsFactors = F)[,-2]
+prirast <- read.csv("./shiny-app/data/stanovnistvo prirodni prirast.csv", stringsAsFactors = F, encoding = "UTF-8")[,-2]
 #prirast <- prirast[-1,]
 prirast_tdy <- gather(subset(prirast, Županija =="Grad Zagreb" | Županija == "Republika Hrvatska"), godina, pop, -Županija)
 
@@ -250,5 +251,60 @@ ggplot(prirast_tdy, aes(godina,pop , color = Županija, group= Županija)) + geo
   labs(x = "Godina", y = "prirodni prirast", "Županija" ) 
 
 
+d <- density(prirast$X1998.)
+plot(d, main="Gustoća prirasta u 1998.")
 
+dotchart(prirast$X2014.,labels=prirast$Županija,cex=.7,
+         main="Prirast po županijama", 
+         xlab="Prirast stanovništva")
+
+transponiraj_dataframe <- function(df){
+  zupanije <- df$Županija
+  
+  # transponiraj sve osim prva dva stupca (imena zupanija)
+  df <- as.data.frame(t(df[,-(1:2)]))
+  colnames(df) <- zupanije
+  rownames(df)<- gsub('X', '',rownames(df))
+  
+  df
+}
+
+prirast_2 <- transponiraj_dataframe(prirast)
+
+podaci <- read.csv("./shiny-app/data/stanovnistvo prirodni prirast.csv", stringsAsFactors = T, encoding = "UTF-8")[,-2]
+podaci <- podaci[-1,]
+ptidy <- gather(podaci, godina, pop, -Županija)
+ptidy$godina <- as.numeric(gsub(".", "", gsub("X", "",ptidy$godina), fixed = T))
+
+
+ggplot(subset(ptidy, Županija == 'Splitsko-dalmatinska'), aes(x = godina, y = pop, fill = Županija)) + 
+  geom_col()+
+  labs(x = "Godina", y = "Prirast", fill = "Županija")+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90))
+
+
+
+ptidy[ptidy$Županija == 'Zagrebačka']
+
+
+
+
+
+prirast[,1:2]
+library(hexbin)
+h <- hexbin(ptidy[,-1])
+plot(h)
+plot(h, colramp=colorRampPalette(rev(brewer.pal(11,'Spectral'))))
+
+
+library(car) 
+scatterplot(pop ~ godina, data=ptidy, 
+            xlab="godina", ylab="prirast", 
+            main="Napredni Scatter Plot", 
+            labels=ptidy$Županija)
+
+
+sm.density.compare(ptidy$pop,ptidy$godina, xlab="Miles Per Gallon") +
+title(main="MPG Distribution by Car Cylinders")
 

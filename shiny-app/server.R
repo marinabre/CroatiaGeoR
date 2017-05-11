@@ -23,6 +23,12 @@ server <- function(input, output, session) {
     tags$h3(class="warning",tags$style(type = "text/css", ".warning {color: red; position: relative; z-index:1000;}"), 
                 ifelse(! is.null(inFile),paste("Prikazani podaci su iz učitane datoteke: \"", inFile$name, "\"!", sep=""), ""))
   })
+  output$show_warning3 <- renderUI({
+    if( length(which(plot_input()$shown_data < 0))>0){
+      tags$h3(class="warning",tags$style(type = "text/css", ".warning {color: red; position: relative; z-index:1000;}"), 
+              "Podaci iz odabrane datoteke imaju negativnih vrijednosti, tortni graf može prikazivati samo one pozitivne!")
+    }
+  })
   
   data_input <- reactive({
     inFile <- input$file1
@@ -131,11 +137,14 @@ server <- function(input, output, session) {
   })
   
   output$barPlot <- renderPlotly({
-      ggplot(plot_input_county_data(), aes(x = year, y = shown_data, fill = LOCALNAME)) + 
-      geom_bar(stat = "identity")+
-      labs(x = "Godina", y = data_y_label(), fill = "Županija")+
-      theme_bw()+
-      theme(axis.text.x = element_text(angle = 90))
+    plot_ly(plot_input_county_data(),
+            x = plot_input_county_data()$year, 
+            y = plot_input_county_data()$shown_data,
+          #color = plot_input_county_data()$LOCALNAME,
+          type = "bar"
+        ) %>% 
+      layout(yaxis = list(title = data_y_label()), 
+             xaxis = list(type="category", categoryorder="category ascending", tickangle=-35, title= paste("Podaci za", input$counties, "županiju po godinama")))
     })
   
   output$linePlot <- renderPlotly({
@@ -171,7 +180,7 @@ server <- function(input, output, session) {
       geom_line()+ 
       geom_point()+
       labs(x = "Godina", y = data_y_label(), col = "Županija")+
-      theme(axis.text.x = element_text(angle = 90)) +
+      theme(axis.text.x = element_text(angle = -90)) +
       theme_bw()
   })
   

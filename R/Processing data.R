@@ -3,8 +3,9 @@ library(xlsx)
 require(xlsx)
 
 #### trimws(x) ---> uklanja leading & trailing spaces
-ocisti_dataframe <- function(df,br_stupaca){
+ocisti_dataframe <- function(df){
   df[df == "-"] <- NA
+  br_stupaca <- length(names(df))
   df[,3:br_stupaca] <- sapply(df[,3:br_stupaca], function(x){as.numeric(gsub(' ', '',x))})
   df[,1] <- trimws(gsub(" županija","",df[,1]))
   df[,2] <- trimws(df[,2])
@@ -38,12 +39,12 @@ names(izvoz)[1] <- "Županija"
 names(izvoz)[2] <- "County.of"
 #u xlsx fileu 2016 ima footnote koji se u Ru ispisuje kao "X2016.1............."
 names(izvoz)[19] <- "X2016."
-izvoz <- ocisti_dataframe(izvoz, 19)
+izvoz <- ocisti_dataframe(izvoz)
 
 uvoz <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx", sheetName ="4.2.3.1.", 
                   startRow=34, encoding = "UTF-8", endRow=57, colIndex = seq(1,19))
 names(uvoz) <- names(izvoz)
-uvoz <- ocisti_dataframe(uvoz, 19)
+uvoz <- ocisti_dataframe(uvoz)
 
 write.csv((izvoz), "./shiny-app/data/izvoz u tisucama kuna.csv", row.names=FALSE, fileEncoding = "UTF-8")
 write.csv((uvoz), "./shiny-app/data/uvoz u tisucama kuna.csv", row.names=FALSE, fileEncoding = "UTF-8")
@@ -54,13 +55,13 @@ izvozEuri <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xl
 izvozEuri <- izvozEuri[-c(1,2), ]
 names(izvozEuri)[1:2] <- names(izvoz)[1:2]
 names(izvozEuri)[9] <- "X2016."
-izvozEuri <- ocisti_dataframe(izvozEuri, 9)
+izvozEuri <- ocisti_dataframe(izvozEuri)
 
 uvozEuri <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx", sheetName ="4.2.3.2.", 
                       startRow=34, encoding = "UTF-8", endRow=57, colIndex = seq(1,9))
 
 names(uvozEuri) <- names(izvozEuri)
-uvozEuri <- ocisti_dataframe(uvozEuri, 9)
+uvozEuri <- ocisti_dataframe(uvozEuri)
 
 write.csv((izvozEuri), "./shiny-app/data/izvoz u tisucama eura.csv", row.names=FALSE, fileEncoding = "UTF-8")
 write.csv((uvozEuri), "./shiny-app/data/uvoz u tisucama eura.csv", row.names=FALSE, fileEncoding = "UTF-8")
@@ -86,7 +87,7 @@ for(j in c(1,2)){
       bdp[,1:2] <- bdp_zup
       names(bdp) <- bdp_names
       }
-    bdp <- (ocisti_dataframe(bdp, 17))
+    bdp <- ocisti_dataframe(bdp)
     write.csv(bdp, paste("./shiny-app/data/bdp BDP",ifelse(j==1,""," po stanovniku")," u tisucama ", ifelse(i==1, "kuna", "eura"), ".csv", sep = ""), row.names=FALSE, fileEncoding = "UTF-8")
   }
 }
@@ -95,17 +96,17 @@ for(j in c(1,2)){
 
 ukupno_izdanih_dozvola <- read.xlsx("./data/statistika u nizu/Gradevinarstvo.xlsx", sheetName ="3.2.1.", 
                                     startRow=7, encoding = "UTF-8", endRow=30, 
-                                    colIndex = seq(1,16), stringsAsFactors=F)
+                                    colIndex = seq(1,17), stringsAsFactors=F)
 #uredni podaci :O
 #visak je "zupanija" nakon naziva svake zupanije
 #zadnji red umjesto "Bez lokacije zupanije2)"	Unclassified2) popraviti na "Nerasporedeno" radi konzistentnosti
 
 ukupno_izdanih_dozvola[23,1] <- "Neraspoređeno"
 ukupno_izdanih_dozvola[23,2] <- "Unclassified"
-ukupno_izdanih_dozvola <- ocisti_dataframe(ukupno_izdanih_dozvola, 16)
+ukupno_izdanih_dozvola <- ocisti_dataframe(ukupno_izdanih_dozvola)
 write.csv((ukupno_izdanih_dozvola), "./shiny-app/data/grad ukupno izdanih grad dozvola.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
-gradevina_stupci <- c(1, 18, 33, 48, 63, 78, 93)
+gradevina_stupci <- c(1, 19, 35, 50, 65, 80, 95)
 gradevina_prvi_sheet <- c("za zgrade.csv", "za ostale gradevine.csv")
 grad_zupanije_Unclassified <- ukupno_izdanih_dozvola[,1:2]
 
@@ -113,8 +114,8 @@ for(i in c(1,2)){
   sobni_stanovi <- ocisti_dataframe(
             read.xlsx("./data/statistika u nizu/Gradevinarstvo.xlsx", sheetName ="3.2.1.", 
                              startRow=7, encoding = "UTF-8", endRow=30, 
-                             colIndex = seq(gradevina_stupci[i+1], gradevina_stupci[i+1]+ 13), 
-                             stringsAsFactors=F), 14)
+                             colIndex = seq(gradevina_stupci[i+1], gradevina_stupci[i+1]+ 14), 
+                             stringsAsFactors=F))
   
   sobni_stanovi <- (cbind(grad_zupanije_Unclassified, sobni_stanovi))
   write.csv(sobni_stanovi, paste("./shiny-app/data/grad izdane grad dozvole", gradevina_prvi_sheet[i]), row.names=FALSE, fileEncoding = "UTF-8")
@@ -127,8 +128,8 @@ gradevina_drugi_sheet <- c("ukupna velicina", "velicina stambenih", "velicina ne
 for(i in c(1,2,3)){
   sobni_stanovi <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Gradevinarstvo.xlsx", sheetName ="3.2.2.", 
                              startRow=7, encoding = "UTF-8", endRow=29, 
-                             colIndex = seq(gradevina_stupci[i], ifelse(i==1, gradevina_stupci[i]+ 15, gradevina_stupci[i]+ 13)),
-                             stringsAsFactors=F), ifelse(i==1, 16, 14))
+                             colIndex = seq(gradevina_stupci[i], ifelse(i==1, gradevina_stupci[i]+ 16, gradevina_stupci[i]+ 14)),
+                             stringsAsFactors=F))
   if(i != 1){
     sobni_stanovi <- cbind(gradevina_zupanije, sobni_stanovi)
   }else{
@@ -143,8 +144,8 @@ gradevina_treci_sheet <- c("broj stanova", "korisna povrsina m2 stanova")
 for(i in c(1,2)){
   sobni_stanovi <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Gradevinarstvo.xlsx", sheetName ="3.2.3.", 
                              startRow=7, encoding = "UTF-8", endRow=29, 
-                             colIndex = seq(gradevina_stupci[i], gradevina_stupci[i]+ 13), 
-                             stringsAsFactors=F), 14)
+                             colIndex = seq(gradevina_stupci[i], ifelse(i == 1, gradevina_stupci[i]+ 16, gradevina_stupci[i]+ 14)), 
+                             stringsAsFactors=F))
   
   if(i !=1) sobni_stanovi <- cbind(gradevina_zupanije, sobni_stanovi)
   
@@ -168,7 +169,7 @@ names(ukupno_velicina_zavrsenih_zgrada)[c(FALSE, TRUE)][-1] <- paste(substr(name
 names(ukupno_velicina_zavrsenih_zgrada)[c(TRUE, FALSE)][-1] <- paste(names(ukupno_velicina_zavrsenih_zgrada)[c(TRUE, FALSE)][-1], "broj")
 
 ukupno_velicina_zavrsenih_zgrada <- ukupno_velicina_zavrsenih_zgrada[-c(1), ]
-ukupno_velicina_zavrsenih_zgrada <- ocisti_dataframe(ukupno_velicina_zavrsenih_zgrada, 30)
+ukupno_velicina_zavrsenih_zgrada <- ocisti_dataframe(ukupno_velicina_zavrsenih_zgrada)
 
 write.csv((ukupno_velicina_zavrsenih_zgrada), "./shiny-app/data/grad ukupna velicina zavrsenih zgrada s izdanom grad dozvolom.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
@@ -180,14 +181,14 @@ for(i in c(1,2)){
   
   vel_zgrada <- cbind(ukupno_velicina_zavrsenih_zgrada[,1:2], vel_zgrada)
   names(vel_zgrada) <- names(ukupno_velicina_zavrsenih_zgrada)
-  vel_zgrada <- (ocisti_dataframe(vel_zgrada, 30))
+  vel_zgrada <- (ocisti_dataframe(vel_zgrada))
   write.csv(vel_zgrada, paste("./shiny-app/data/grad", gradevina_drugi_sheet[i+1], "(zavrsenih) zgrada s izdanom grad dozvolom.csv"), row.names=FALSE, fileEncoding = "UTF-8")
 }
 rm(vel_zgrada)
 ## 3.2.5. - ZAVRsENI STANOVI 
 zavrseni_stanovi <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Gradevinarstvo.xlsx", sheetName ="3.2.5.", 
                               startRow=8, encoding = "UTF-8", endRow=30, 
-                              colIndex = seq(1,30), stringsAsFactors=F), 30)
+                              colIndex = seq(1,30), stringsAsFactors=F))
 
 names(zavrseni_stanovi) <- names(ukupno_velicina_zavrsenih_zgrada)
 write.csv((zavrseni_stanovi), paste("./shiny-app/data/grad ukupni broj zavrsenih stanova s izdanom grad dozvolom.csv"), row.names=FALSE, fileEncoding = "UTF-8")
@@ -205,7 +206,7 @@ grad_fja_obrada <- function(brojIteracija, sheet, pocetniRed, krajnjiRed, zupani
     }else{
       sobni_stanovi[,1] <- zupanija[,1]
     }
-    sobni_stanovi <- (ocisti_dataframe(sobni_stanovi, 15))
+    sobni_stanovi <- (ocisti_dataframe(sobni_stanovi))
     write.csv(sobni_stanovi, paste("./shiny-app/data/grad", sheetImena[i], "s izdanom grad dozvolom.csv"), row.names=FALSE, fileEncoding = "UTF-8")
   }
 }
@@ -224,7 +225,7 @@ grad_fja_obrada(seq(1,7), "3.2.7.", 7, 30, grad_zupanije_Unclassified, gradevina
 industrija <- (ocisti_dataframe(read.xlsx("./data/statistika u nizu/Industrija.xlsx", sheetName ="2.1.2.1.", 
                                                                 startRow=9, encoding = "UTF-8", endRow=32, 
                                                                 colIndex = seq(1,15), 
-                                                                stringsAsFactors=F), 13))
+                                                                stringsAsFactors=F)))
 industrija[4,1] <- "Sisačko-moslavačka"
 write.csv(industrija, "./shiny-app/data/industrija ukupna vrijednost prodanih proizvoda po NP-u.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
@@ -237,7 +238,7 @@ for(i in seq(1,5)){
   kultura <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Kultura.xlsx", sheetName =kultura_sheetovi[i], 
                           startRow=7, encoding = "UTF-8", endRow=29, 
                           colIndex = seq(1,25), 
-                          stringsAsFactors=F),25)
+                          stringsAsFactors=F))
   if(i == 1)
     kultura_names <- names(kultura)
   names(kultura) <- kultura_names
@@ -254,16 +255,16 @@ obrazovanje_podaci_1 <- c("djecji vrtici", "osnovne skole", "srednje skole")
 for(i in c(1,2,3)){
   obrazovanje_ustanove <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Obrazovanje.xlsx", sheetName = obrazovanje_sheetovi_1[i], 
                            startRow=7, encoding = "UTF-8", endRow=29, 
-                           colIndex = seq(1,13), 
-                           stringsAsFactors=F),13)
+                           colIndex = seq(1, ifelse(i== 1, 13, 14)), 
+                           stringsAsFactors=F))
   
   obrazovanje_djeca <- read.xlsx("./data/statistika u nizu/Obrazovanje.xlsx", sheetName = obrazovanje_sheetovi_1[i], 
                             startRow=7, encoding = "UTF-8", endRow=29, 
-                            colIndex = seq(15,25), 
+                            colIndex = seq(ifelse(i==1,15,16),ifelse(i==1,25,27)), 
                             stringsAsFactors=F)
   
   obrazovanje_djeca <- cbind(obrazovanje_ustanove[,1:2], obrazovanje_djeca)
-  obrazovanje_djeca <- ocisti_dataframe(obrazovanje_djeca, 13)
+  obrazovanje_djeca <- ocisti_dataframe(obrazovanje_djeca)
   names(obrazovanje_djeca)[-(1:2)] <- gsub('.{6}$', '', names(obrazovanje_djeca)[-(1:2)])
   names(obrazovanje_ustanove)[-(1:2)] <- gsub('.{6}$', '', names(obrazovanje_ustanove)[-(1:2)])
   
@@ -278,7 +279,7 @@ for(i in c(1,2)){
   obrazovanje_ukupno <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Obrazovanje.xlsx", sheetName = obrazovanje_sheetovi_2[i], 
                                   startRow=7, encoding = "UTF-8", endRow=30, 
                                   colIndex = seq(1,ifelse(i==1,22,23)), 
-                                  stringsAsFactors=F), ifelse(i==1,22,23))
+                                  stringsAsFactors=F))
   
   obrazovanje_redovni <- read.xlsx("./data/statistika u nizu/Obrazovanje.xlsx", sheetName = obrazovanje_sheetovi_2[i], 
                                   startRow=7, encoding = "UTF-8", endRow=30, 
@@ -286,7 +287,7 @@ for(i in c(1,2)){
                                   stringsAsFactors=F)
   
   obrazovanje_redovni <- cbind(obrazovanje_ukupno[,1:2], obrazovanje_redovni)
-  obrazovanje_redovni <- ocisti_dataframe(obrazovanje_redovni, ifelse(i==1,22,23))
+  obrazovanje_redovni <- ocisti_dataframe(obrazovanje_redovni)
   if(i == 1)
   {#micanje akademskih godina, pise samo prva godina
     names(obrazovanje_ukupno)[-(1:2)] <- gsub('.{6}$', '', names(obrazovanje_ukupno)[-(1:2)])
@@ -318,7 +319,7 @@ for(i in c(1,2,3)){
     okolis_zupanije <- okolis[,1:2]
   }
   names(okolis)[10] <- "X2015." #micanje anotacije
-  okolis <- (ocisti_dataframe(okolis, 10))
+  okolis <- (ocisti_dataframe(okolis))
   write.csv(okolis, paste("./shiny-app/data/zastita okolisa", okolis_imena[i]), row.names=FALSE, fileEncoding = "UTF-8")
 }
 rm(okolis)
@@ -330,15 +331,15 @@ rm(okolis)
 st_broj_zupanija_prvi <- seq(8, 155, 7)
 
 #trebaju nam headeri
-stanovnistvo_names <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Stanovnistvo.xlsx", sheetName = "7.2.1.",
+stanovnistvo_names <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Stanovnistvo.xlsx", sheetName = "7.4.1.",
           startRow=7, encoding = "UTF-8", endRow=8,
           colIndex = seq(1,20),
-          stringsAsFactors=F),20)
+          stringsAsFactors=F))
 
 #lista, svaki clan liste je ujedno dataframe sa podacima za pojedinu zupaniju
 stanovnistvo_prirodno_kretanje <- list()
 stanovnistvo_prirodno_kretanje <- lapply(st_broj_zupanija_prvi, function(i){
-  read.xlsx("./data/statistika u nizu/Stanovnistvo.xlsx", sheetName = "7.2.1.", 
+  read.xlsx("./data/statistika u nizu/Stanovnistvo.xlsx", sheetName = "7.4.1.", 
             startRow=i, encoding = "UTF-8", endRow=i+5, 
             colIndex = seq(1,20), 
             stringsAsFactors=F)
@@ -356,7 +357,7 @@ st_razvedeni_brakovi <- stanovnistvo_names[F,]
 
 
 for(i in seq(1,22)){
-  pom <- ocisti_dataframe(data.frame(stanovnistvo_prirodno_kretanje[i]), 20)
+  pom <- ocisti_dataframe(data.frame(stanovnistvo_prirodno_kretanje[i]))
 
   #kako bi pokupili naziv zupanije u svaki redak
   for(j in seq(1,5))    pom[j,][1:2] <- trimws(gsub(".", " ",names(pom)[1:2], fixed = TRUE))
@@ -384,14 +385,14 @@ write.csv((st_razvedeni_brakovi), "./shiny-app/data/stanovnistvo broj razvedenih
 
 ##7.2.2. DOSELJENO I ODSELJENO STANOVNIsTVO
 #taman kada pomislis da je gornji sheet nesto najgore ikad...
-stanovnistvo_names <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Stanovnistvo.xlsx", sheetName = "7.2.2.",
+stanovnistvo_names <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Stanovnistvo.xlsx", sheetName = "7.4.2.",
                                 startRow=7, encoding = "UTF-8", endRow=8,
                                 colIndex = seq(1,20),
-                                stringsAsFactors=F), 20)
+                                stringsAsFactors=F))
 
 stanovnistvo_doseljeno_iseljeno <- list()
 stanovnistvo_doseljeno_iseljeno <- lapply(seq(8, 197, 9), function(i){
-  read.xlsx("./data/statistika u nizu/Stanovnistvo.xlsx", sheetName = "7.2.2.", 
+  read.xlsx("./data/statistika u nizu/Stanovnistvo.xlsx", sheetName = "7.4.2.", 
             startRow=i, encoding = "UTF-8", endRow=i+7, 
             colIndex = seq(1,20), 
             stringsAsFactors=F)
@@ -406,7 +407,7 @@ st_odseljeni_druga_zup <- stanovnistvo_names[F,]
 st_odseljeni_druga_drz <- stanovnistvo_names[F,]
 
 for(i in seq(1,22)){
-  pom <- ocisti_dataframe(data.frame(stanovnistvo_doseljeno_iseljeno[i]), 20)
+  pom <- ocisti_dataframe(data.frame(stanovnistvo_doseljeno_iseljeno[i]))
   
   #kako bi pokupili naziv zupanije u svaki redak
   for(j in seq(1,7))    pom[j,][1:2] <- trimws(gsub(".", " ",names(pom)[1:2], fixed = TRUE))
@@ -438,10 +439,10 @@ write.csv((st_odseljeni_druga_zup), "./shiny-app/data/stanovnistvo broj odseljen
 write.csv((st_odseljeni_druga_drz), "./shiny-app/data/stanovnistvo broj odseljenih u drugu drzavu.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
 ##7.2.3. PROCJENA UKUPNOG BROJA STANOVNIKA SREDINOM GODINE
-stanovnistvo_procjena <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Stanovnistvo.xlsx", sheetName = "7.2.3.",
+stanovnistvo_procjena <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Stanovnistvo.xlsx", sheetName = "7.4.3.",
                                 startRow=7, encoding = "UTF-8", endRow=29,
                                 colIndex = seq(1,17),
-                                stringsAsFactors=F),17)
+                                stringsAsFactors=F))
 
 names(stanovnistvo_procjena)[3:17] <- gsub('.{2}$', '', names(stanovnistvo_procjena)[3:17] ) #micanje anotacija s godina
 write.csv((stanovnistvo_procjena), "./shiny-app/data/stanovnistvo procjena br st sredinom godine.csv", row.names=FALSE, fileEncoding = "UTF-8")
@@ -451,7 +452,7 @@ write.csv((stanovnistvo_procjena), "./shiny-app/data/stanovnistvo procjena br st
 tran_cestovna <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.1.",
                                    startRow=9, encoding = "UTF-8", endRow=32,
                                    colIndex = seq(1,13),
-                                   stringsAsFactors=F)[-c(2),], 13)
+                                   stringsAsFactors=F)[-c(2),])
 tran_cestovna[4,1] <- "Sisačko-moslavačka" #ispravljanje tipfelera
 write.csv((tran_cestovna), "./shiny-app/data/transport ukupni broj cestovnih mreza.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
@@ -467,7 +468,7 @@ for(i in seq(1,4)){
   if(i == 1){
     tran_ceste[1:2] <-NA
   }
-  tran_ceste <- (ocisti_dataframe(cbind(tran_cestovna[,1:2], tran_ceste), 13))
+  tran_ceste <- (ocisti_dataframe(cbind(tran_cestovna[,1:2], tran_ceste)))
   write.csv(tran_ceste, paste("./shiny-app/data/transport ukupni broj", tran_sheet1[i]), row.names=FALSE, fileEncoding = "UTF-8")
 }
 rm(tran_ceste)
@@ -475,14 +476,14 @@ rm(tran_ceste)
 tran_gustoca <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.2.",
                                             startRow=8, encoding = "UTF-8", endRow=31,
                                             colIndex = seq(1,13),
-                                            stringsAsFactors=F)[-c(2),], 13)
+                                            stringsAsFactors=F)[-c(2),])
 tran_gustoca[4,1] <- "Sisačko-moslavačka" #ispravljanje tipfelera
 write.csv(tran_gustoca, "./shiny-app/data/transport gustoca cestovne mreze.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
 tran_prijevoz_robe <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Transport.xlsx", sheetName = "5.4.3.",
                                            startRow=9, encoding = "UTF-8", endRow=32,
                                            colIndex = seq(1,17),
-                                           stringsAsFactors=F)[-c(2),], 17)
+                                           stringsAsFactors=F)[-c(2),])
 tran_prijevoz_robe[4,1] <- "Sisačko-moslavačka" #ispravljanje tipfelera
 write.csv(tran_prijevoz_robe, "./shiny-app/data/transport cestovni prijevoz robe.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
@@ -513,7 +514,7 @@ for (j in c(1,2)){
     }else{
       tran_nesrece <- cbind(tran_zup, tran_nesrece)
     }
-    tran_nesrece <- ocisti_dataframe(tran_nesrece,14)
+    tran_nesrece <- ocisti_dataframe(tran_nesrece)
     write.csv(tran_nesrece, paste("./shiny-app/data/transport broj",ifelse(j==1, "prometnih nesreca", "nastradalih u prometu"), tran_nesrece_imena[i]), row.names=FALSE, fileEncoding = "UTF-8")
   }
 }
@@ -536,8 +537,8 @@ for(j in c(1,2)){
     if(j == 2 && i == 3) break()
     turizam_dolasci <- read.xlsx("./data/statistika u nizu/Turizam.xlsx", sheetName = tur_sheet[j],
                                                      startRow=7, encoding = "UTF-8", endRow=30,
-                                                     colIndex = seq(ifelse(i==1, 1, ifelse(i==2, 26, 49)),
-                                                                    ifelse(i==1, 24, ifelse(i==2, 47, 70))),
+                                                     colIndex = seq(ifelse(i==1, 1, ifelse(i==2, 27, 51)),
+                                                                    ifelse(i==1, 25, ifelse(i==2, 49, 73))),
                                                      stringsAsFactors=F)
     turizam_dolasci <- turizam_dolasci[-c(2),]
     #Anotacije na 14. i 16. retku od naziva zupanija
@@ -551,7 +552,7 @@ for(j in c(1,2)){
       turizam_dolasci <- cbind(tur_zup, turizam_dolasci)
       names(turizam_dolasci) <- tur_nam
     }
-    turizam_dolasci <- (ocisti_dataframe(turizam_dolasci, 24))
+    turizam_dolasci <- (ocisti_dataframe(turizam_dolasci))
     write.csv(turizam_dolasci, paste("./shiny-app/data/turizam broj",ifelse(j==1, "dolazaka", "nocenja"), ifelse(i == 2 && j==2, tur_imena[i+1], tur_imena[i])), row.names=FALSE, fileEncoding = "UTF-8")
   }
 }
@@ -564,8 +565,8 @@ tur_imena <- c("luka u nautickom turizmu.csv", "plovila na stalnom vezu u lukama
 for(i in seq(1,3)){
   tur_luke <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Turizam.xlsx", sheetName = "4.3.2.3.",
                             startRow=7, encoding = "UTF-8", endRow=14,
-                            colIndex = seq( ifelse(i==1,1, ifelse(i==2,15,27)), ifelse(i==1,13, ifelse(i==2,25,37))),
-                            stringsAsFactors=F),ifelse(i==1,13,11))
+                            colIndex = seq( ifelse(i==1,1, ifelse(i==2,16,29)), ifelse(i==1,14, ifelse(i==2,27,40))),
+                            stringsAsFactors=F))
   if(i!= 1){
     tur_luke <- cbind(tur_zup, tur_luke)
   }else{
@@ -581,7 +582,7 @@ rm(tur_luke)
 zaposlenost <- function(sheet, br_podataka, imena, pocetni_red, zadnji_stupac){
   zap1 <- ocisti_dataframe(read.xlsx("./data/statistika u nizu/Zaposlenost i place.xlsx", sheetName = sheet,
                                     startRow=pocetni_red, encoding = "UTF-8", endRow=pocetni_red+22,
-                                    colIndex = seq(1,zadnji_stupac), stringsAsFactors=F),zadnji_stupac)
+                                    colIndex = seq(1,zadnji_stupac), stringsAsFactors=F))
   
   zap1[4,1] <- "Sisačko-moslavačka" #ispravljanje tipfelera
   write.csv((zap1), paste("./shiny-app/data/zaposlenost ", imena[1], ".csv", sep=""), row.names=FALSE, fileEncoding = "UTF-8")
@@ -591,7 +592,7 @@ zaposlenost <- function(sheet, br_podataka, imena, pocetni_red, zadnji_stupac){
     zap2 <- read.xlsx("./data/statistika u nizu/Zaposlenost i place.xlsx", sheetName = sheet,
                                        startRow=7, encoding = "UTF-8", endRow=29,
                                        colIndex = seq(25,45), stringsAsFactors=F)
-    zap2 <- ocisti_dataframe(cbind(zap1[,1:2], zap2),23)
+    zap2 <- ocisti_dataframe(cbind(zap1[,1:2], zap2))
     names(zap2) <- names(zap1)
     write.csv((zap2), paste("./shiny-app/data/zaposlenost ", imena[2], ".csv", sep=""), row.names=FALSE, fileEncoding = "UTF-8")
   }
@@ -605,3 +606,85 @@ zaposlenost("9.2.5.", 1, c("zaposleni u obrtu i slobodnim profesijama"),7,19)
 zaposlenost("9.2.6.", 1, c("zaposleni u pravnim osobama"),7,19)
 zaposlenost("9.2.7.", 1, c("aktivno stanovnistvo"),7,19)
 zaposlenost("9.2.8.", 1, c("ukupno zaposleni"),7,19)
+
+
+#stvaranje "relativnih" podataka za tablice ####
+procjena_godine <- names(stanovnistvo_procjena)
+stanovnistvo_procjena <- stanovnistvo_procjena[order(stanovnistvo_procjena$Županija),]
+rownames(stanovnistvo_procjena) <- NULL
+
+
+#robna razmjena ####
+uvoz <- uvoz[-23,] ## uklanjanje neraspoređeno retka
+uvoz <- uvoz[order(uvoz$Županija),]
+rownames(uvoz) <- NULL
+rel_uvoz <- subset(uvoz, select = names(uvoz) %in% procjena_godine)
+
+rel_uvoz_proba <- cbind(rel_uvoz[1],round(rel_uvoz[-(1:2)]/stanovnistvo_procjena[-(1:2)],1))
+
+uvozEuri
+izvoz
+izvozEuri
+
+
+
+#BDP ne treba jer ima i po stanovniku podatke
+
+#Građevinarstvo
+ukupno_izdanih_dozvola <- ukupno_izdanih_dozvola[-23,]
+ukupno_izdanih_dozvola <- ukupno_izdanih_dozvola[order(ukupno_izdanih_dozvola$Županija),]
+rownames(ukupno_izdanih_dozvola) <- NULL
+rel_izdane_dozvole <- subset(ukupno_izdanih_dozvola, select = names(ukupno_izdanih_dozvola) %in% procjena_godine)
+rel_izdane_dozvole <- cbind(rel_izdane_dozvole[1:2],round(rel_izdane_dozvole[-(1:2)]/stanovnistvo_procjena[-(1:3)],4))
+
+pripremi_dataframe <- function(df){
+  names(df)[1] <- "Županija"
+  df <- df[order(df$Županija),]
+  df <- df[!(df$Županija == "Neraspoređeno" | df$Županija == "Slobodne zone" | df$Županija == "Ukupno"),]
+  names(df) <- gsub("X", "", names(df))
+  rownames(df) <- NULL
+  subset(df, select = names(df) %in% procjena_godine)
+}
+
+iteriraj_po_setu<- function(naziv){
+  source_files <-list.files(path = "./shiny-app/data", pattern = paste("(",naziv ,") .*.csv", sep = ""), all.files = T, full.names = T, recursive = F)
+  for(file in source_files){
+    rel_podaci <- pripremi_dataframe(read.csv(file, stringsAsFactors = F, encoding = "UTF-8"))
+    tryCatch({
+    pom_stanovnici <- subset(stanovnistvo_procjena, select = names(stanovnistvo_procjena) %in% names(rel_podaci))
+    pom_stanovnici <- pom_stanovnici[(pom_stanovnici$Županija %in% rel_podaci$Županija),]
+    rownames(pom_stanovnici) <- NULL
+    rel_podaci <- cbind(rel_podaci[1:2],round(rel_podaci[-(1:2)]/pom_stanovnici[-(1:2)],6))
+    
+    write.csv(rel_podaci, gsub("./shiny-app/data/", "./shiny-app/data/relativno/", file), row.names=FALSE, fileEncoding = "UTF-8")
+    }, error = function(e){})
+  }
+}
+
+iteriraj_po_setu("grad")
+#industrija
+industrija <- pripremi_dataframe(industrija)
+pom_stanovnici <- subset(stanovnistvo_procjena, select = names(stanovnistvo_procjena) %in% names(industrija))
+  
+rel_podaci <- cbind(industrija[1:2],round(industrija[-(1:2)]/pom_stanovnici[-(1:2)],4))
+  
+write.csv(rel_podaci, "./shiny-app/data/relativno/industrija ukupna vrijednost prodanih proizvoda po NP-u.csv", row.names=FALSE, fileEncoding = "UTF-8")
+  
+
+#kultura
+iteriraj_po_setu("kultura")
+
+#obrazovanje
+iteriraj_po_setu("obrazovanje")
+
+#transport
+iteriraj_po_setu("transport") #oni imaju policijsku upravuuuu
+
+#turizam
+iteriraj_po_setu("turizam")
+
+#zaposlenost
+iteriraj_po_setu("zaposlenost")
+
+#okoliš
+iteriraj_po_setu("zastita")
