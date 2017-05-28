@@ -10,19 +10,20 @@ library(shiny)
 library(shinydashboard)
 library(magrittr)
 library(tidyr)
+#if (!require('devtools')) install.packages('devtools')
+library(crosstalk)
 library(leaflet)
 library(ggplot2)
 library(plotly)
-
-#source("Global.R")
 
 server <- function(input, output, session) {
 
   output$show_warning <- output$show_warning1 <- output$show_warning2 <- renderUI({
     inFile <- input$file1
     tags$h3(class="warning",tags$style(type = "text/css", ".warning {color: red; position: relative; z-index:1000;}"), 
-                ifelse(! is.null(inFile),paste("Prikazani podaci su iz učitane datoteke: \"", inFile$name, "\"!", sep=""), ""))
+            ifelse(! is.null(inFile),paste("Prikazani podaci su iz učitane datoteke: \"", inFile$name, "\"!", sep=""), ""))
   })
+  
   output$show_warning3 <- renderUI({
     if( length(which(plot_input()$shown_data < 0))>0){
       tags$h3(class="warning",tags$style(type = "text/css", ".warning {color: red; position: relative; z-index:1000;}"), 
@@ -39,7 +40,6 @@ server <- function(input, output, session) {
       new_data <- read.csv(input$file_source, stringsAsFactors = F, encoding = "UTF-8")
     }
     names(new_data)[1] <- "LOCALNAME"
-    #new_data <- new_data[order(new_data$LOCALNAME),]
     rownames(new_data) <- NULL
     new_data
   })
@@ -79,8 +79,9 @@ server <- function(input, output, session) {
     merge(counties_RH, data_input(), by="LOCALNAME")
   })
   
-  colorpal <- reactive({
-    colorNumeric(input$colors, NULL)
+  colorpal <- reactive({ #min & max are used here to ensure same color scale for all data in dataset
+    help <- subset(data_input(), LOCALNAME != "Republika Hrvatska")
+    colorNumeric(input$colors, c(min(help[,-(1:2)], na.rm = T), max(help[,-(1:2)], na.rm = T)))
   })
   
   chosen_year <- reactive({
@@ -116,45 +117,37 @@ server <- function(input, output, session) {
   
   output$countyPlot <- renderLeaflet({
       leaflet(data = plot_input_county()) %>%
-        addTiles(options = tileOptions(minZoom = 7, maxZoom = 12)) %>%
-        addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                    opacity = 1.0, fillOpacity = 0.3, label = ~LOCALNAME)
-      
+      addTiles(options = tileOptions(minZoom = 7, maxZoom = 12)) %>%
+      addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5, opacity = 1.0, fillOpacity = 0.3, label = ~LOCALNAME)
     })
 
   output$mymap <- renderLeaflet({
     leaflet(data = dat_source(), options = leafletOptions(minZoom = 7, maxZoom = 9)) %>%
-      #setView(zoom = 7, lng = 15, lat=43) %>%
-      #fitBounds(lat1=42, lng1=10, lat2=46, lng2=18) %>%
-      addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-                  opacity = 1.0, fillOpacity = 0.5, fillColor = ~colorpal()(chosen_year()),
-                  label = ~paste0(LOCALNAME, ": ", formatC(chosen_year(), big.mark = ".", decimal.mark=",")),
-                  highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                      bringToFront = TRUE)) %>%
-      addLegend(position = "bottomright", pal = colorpal(), 
-                values = ~log10(chosen_year()), title=legend_title(), 
-                opacity = 1.0, labFormat = labelFormat(transform = function(x) round(10^x)))
+    addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+                opacity = 1.0, fillOpacity = 0.5, fillColor = ~colorpal()(chosen_year()),
+                label = ~paste0(LOCALNAME, ": ", formatC(chosen_year(), big.mark = ".", decimal.mark=",")),
+                highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = TRUE)) %>%
+    addLegend(position = "bottomright", pal = colorpal(), 
+              values = ~chosen_year(), title=legend_title(), 
+              opacity = 1.0)
   })
   
   output$barPlot <- renderPlotly({
     plot_ly(plot_input_county_data(),
             x = plot_input_county_data()$year, 
             y = plot_input_county_data()$shown_data,
-          #color = plot_input_county_data()$LOCALNAME,
-          type = "bar"
-        ) %>% 
-      layout(yaxis = list(title = data_y_label()), 
-             xaxis = list(type="category", categoryorder="category ascending", tickangle=-35, title= paste("Podaci za", input$counties, "županiju po godinama")))
+            type = "bar") %>% 
+    layout(yaxis = list(title = data_y_label()), 
+           xaxis = list(type="category", categoryorder="category ascending", tickangle=-35, title= paste("Podaci za", input$counties, "županiju po godinama")))
     })
   
   output$linePlot <- renderPlotly({
     ggplot(plot_input_CRO_and_county(), aes(x = year, y = shown_data, color=LOCALNAME, group = LOCALNAME))  + 
-      geom_line()+ 
-      geom_point()+
-      labs(x = "Godina", y = data_y_label(), col = "Županija")+
-      theme_bw() +
-      theme(axis.text.x = element_text(angle = 90))
-      
+    geom_line() + 
+    geom_point() +
+    labs(x = "Godina", y = data_y_label(), col = "Županija") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90))
   })
   
   output$event <- renderPrint({
@@ -163,63 +156,62 @@ server <- function(input, output, session) {
   
   output$piePlot <- renderPlotly({
     plot_ly(pie_plot_input(), labels = ~LOCALNAME, values = ~shown_data, type = 'pie',
-            textposition = 'inside',
-            textinfo = 'label+percent',
-            insidetextfont = list(color = '#FFFFFF'),
-            marker = list(colors = colors,
-                          line = list(color = '#FFFFFF', width = 1)),
-            #The 'pull' attribute can also be used to create space between the sectors
-            showlegend = FALSE) %>%
-      layout(title = pie_plot_legend(),
-             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+          textposition = 'inside',
+          textinfo = 'label+percent',
+          insidetextfont = list(color = '#FFFFFF'),
+          marker = list(colors = colors, line = list(color = '#FFFFFF', width = 1)),
+          #The 'pull' attribute can also be used to create space between the sectors
+          showlegend = FALSE) %>%
+    layout(title = pie_plot_legend(),
+           xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+           yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
   })
   
   output$linePlot_multiple <- renderPlotly({
     ggplot(county_multiple_input(), aes(x = year, y = shown_data, color=LOCALNAME, group = LOCALNAME))  + 
-      geom_line()+ 
-      geom_point()+
-      labs(x = "Godina", y = data_y_label(), col = "Županija")+
-      theme(axis.text.x = element_text(angle = -90)) +
-      theme_bw()
+    geom_line() + 
+    geom_point() +
+    labs(x = "Godina", y = data_y_label(), col = "Županija") +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90))
   })
+  
+  output$gifJedan <- renderImage({
+    #ALELUJA
+    fname <- "./www/gif/APS BDP u tisucama eura.gif"
+    list(src=fname,
+         contentType="image/gif",
+         width = 823,
+         height = 617
+         )
+    }, deleteFile=FALSE)
+  output$gifDva <- renderImage({
+    #ALELUJA
+    fname <- "./www/gif/REL BDP u tisucama eura.gif"
+    list(src=fname,
+         contentType="image/gif",
+         width = 823,
+         height = 617
+    )
+  }, deleteFile=FALSE)
+  
   
   
   #?theme
   observe({
-    #updated <- F
-    #if(input$file_source != source_files[1]){
       updateSelectInput(session, "years",
                         label = "Godine podataka",
-                        choices = names(data_input())[-(1:2)], selected = tail(names(data_input())[-(1:2)], 1)
-      )
+                        choices = names(data_input())[-(1:2)], selected = tail(names(data_input())[-(1:2)], 1) )
       updateSelectInput(session, "years2",
                         label = "Godine podataka",
-                        choices = names(data_input())[-(1:2)], selected = tail(names(data_input())[-(1:2)], 1)
-      )
+                        choices = names(data_input())[-(1:2)], selected = tail(names(data_input())[-(1:2)], 1) )
       updateSelectInput(session, "counties",
                         label = "Odabir županije",
-                        choices = data_input()[,1], selected = data_input()[,1][2]
-      )
+                        choices = data_input()[,1], selected = data_input()[,1][2] )
       updateSelectInput(session, "counties_multiple",
                         label = "Odabir županija za prikaz",
-                        choices = data_input()[,1], selected = data_input()[,1][2]
-      )
-      updated <- T
-    #}
-    # if(!updated){
-    #   new_data <- dat_source()
-    #   leafletProxy("mymap", data = new_data)  %>% clearControls() %>% clearShapes() %>%
-    #     addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-    #                 opacity = 1.0, fillOpacity = 0.5, fillColor = ~colorpal()(chosen_year()),
-    #                 label = ~paste0(LOCALNAME, ": ", formatC(chosen_year(), big.mark = ".", decimal.mark=",")),
-    #                 highlightOptions = highlightOptions(color = "white", weight = 2,
-    #                                                     bringToFront = TRUE)) %>%
-    #     addLegend(position = "bottomright", pal = colorpal(), 
-    #               values = ~log10(chosen_year()), title=legend_title(), 
-    #               opacity = 1.0, labFormat = labelFormat(transform = function(x) round(10^x)))
-    # }
-    
-    
+                        choices = data_input()[,1], selected = data_input()[,1][2] )
+
    })
+  
 }
