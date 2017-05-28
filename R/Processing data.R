@@ -1,6 +1,7 @@
 install.packages('xlsx')
 library(xlsx)
 require(xlsx)
+library(dplyr)
 
 #### trimws(x) ---> uklanja leading & trailing spaces
 ocisti_dataframe <- function(df){
@@ -41,13 +42,24 @@ names(izvoz)[2] <- "County.of"
 names(izvoz)[19] <- "X2016."
 izvoz <- ocisti_dataframe(izvoz)
 
+#stupci 2015. i 2016. su pomnoženi sa 1000 - greška u dzsu!!!
+izvoz$`2015.` <- izvoz$`2015.` / 1000
+izvoz$`2016.` <- izvoz$`2016.` / 1000
+
+
 uvoz <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx", sheetName ="4.2.3.1.", 
                   startRow=34, encoding = "UTF-8", endRow=57, colIndex = seq(1,19))
 names(uvoz) <- names(izvoz)
 uvoz <- ocisti_dataframe(uvoz)
 
 write.csv((izvoz), "./shiny-app/data/izvoz u tisucama kuna.csv", row.names=FALSE, fileEncoding = "UTF-8")
+
+uvoz$`2015.` <- uvoz$`2015.` / 1000
+uvoz$`2016.` <- uvoz$`2016.` / 1000
+
 write.csv((uvoz), "./shiny-app/data/uvoz u tisucama kuna.csv", row.names=FALSE, fileEncoding = "UTF-8")
+
+
 
 izvozEuri <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx", sheetName ="4.2.3.2.", 
                        startRow=8, encoding = "UTF-8", endRow=33, colIndex = seq(1,9))
@@ -56,14 +68,21 @@ izvozEuri <- izvozEuri[-c(1,2), ]
 names(izvozEuri)[1:2] <- names(izvoz)[1:2]
 names(izvozEuri)[9] <- "X2016."
 izvozEuri <- ocisti_dataframe(izvozEuri)
+## 2012. - 2016. su pomnožene sa 1000
+izvozEuri[,5:9] <- izvozEuri[,5:9] / 1000
+
+izvozEuri$Županija <- izvoz$Županija
 
 uvozEuri <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx", sheetName ="4.2.3.2.", 
                       startRow=34, encoding = "UTF-8", endRow=57, colIndex = seq(1,9))
 
 names(uvozEuri) <- names(izvozEuri)
 uvozEuri <- ocisti_dataframe(uvozEuri)
-
+uvozEuri$Županija <- izvoz$Županija
 write.csv((izvozEuri), "./shiny-app/data/izvoz u tisucama eura.csv", row.names=FALSE, fileEncoding = "UTF-8")
+
+## 2012. - 2016. su pomnožene sa 1000
+uvozEuri[,5:9] <- uvozEuri[,5:9] / 1000
 write.csv((uvozEuri), "./shiny-app/data/uvoz u tisucama eura.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
 
@@ -347,7 +366,6 @@ stanovnistvo_prirodno_kretanje <- lapply(st_broj_zupanija_prvi, function(i){
 
 head(stanovnistvo_prirodno_kretanje)
 
-library(dplyr)
 #za svaki set podataka definiramo zasebni dataframe, stavljamo prazan al sa imenima koja nam trebaju
 st_zivorodeni <- stanovnistvo_names[F,]
 st_umrli <- stanovnistvo_names[F,]
@@ -433,7 +451,7 @@ rm(pom)
 write.csv((st_saldo), "./shiny-app/data/stanovnistvo saldo migracije s inozemstvom.csv", row.names=FALSE, fileEncoding = "UTF-8")
 write.csv((st_doseljeni), "./shiny-app/data/stanovnistvo broj doseljenih.csv", row.names=FALSE, fileEncoding = "UTF-8")
 write.csv((st_doseljeni_druga_zup), "./shiny-app/data/stanovnistvo broj doseljenih iz druge zupanije.csv", row.names=FALSE, fileEncoding = "UTF-8")
-write.csv((st_doseljeni_druga_drz), "./shiny-app/data/stanovnistvo broj broj doseljenih iz druge drzave.csv", row.names=FALSE, fileEncoding = "UTF-8")
+write.csv((st_doseljeni_druga_drz), "./shiny-app/data/stanovnistvo broj doseljenih iz druge drzave.csv", row.names=FALSE, fileEncoding = "UTF-8")
 write.csv((st_odseljeni), "./shiny-app/data/stanovnistvo broj odseljenih.csv", row.names=FALSE, fileEncoding = "UTF-8")
 write.csv((st_odseljeni_druga_zup), "./shiny-app/data/stanovnistvo broj odseljenih u drugu zupaniju.csv", row.names=FALSE, fileEncoding = "UTF-8")
 write.csv((st_odseljeni_druga_drz), "./shiny-app/data/stanovnistvo broj odseljenih u drugu drzavu.csv", row.names=FALSE, fileEncoding = "UTF-8")
@@ -613,34 +631,12 @@ procjena_godine <- names(stanovnistvo_procjena)
 stanovnistvo_procjena <- stanovnistvo_procjena[order(stanovnistvo_procjena$Županija),]
 rownames(stanovnistvo_procjena) <- NULL
 
-
-#robna razmjena ####
-uvoz <- uvoz[-23,] ## uklanjanje neraspoređeno retka
-uvoz <- uvoz[order(uvoz$Županija),]
-rownames(uvoz) <- NULL
-rel_uvoz <- subset(uvoz, select = names(uvoz) %in% procjena_godine)
-
-rel_uvoz_proba <- cbind(rel_uvoz[1],round(rel_uvoz[-(1:2)]/stanovnistvo_procjena[-(1:2)],1))
-
-uvozEuri
-izvoz
-izvozEuri
-
-
-
 #BDP ne treba jer ima i po stanovniku podatke
-
-#Građevinarstvo
-ukupno_izdanih_dozvola <- ukupno_izdanih_dozvola[-23,]
-ukupno_izdanih_dozvola <- ukupno_izdanih_dozvola[order(ukupno_izdanih_dozvola$Županija),]
-rownames(ukupno_izdanih_dozvola) <- NULL
-rel_izdane_dozvole <- subset(ukupno_izdanih_dozvola, select = names(ukupno_izdanih_dozvola) %in% procjena_godine)
-rel_izdane_dozvole <- cbind(rel_izdane_dozvole[1:2],round(rel_izdane_dozvole[-(1:2)]/stanovnistvo_procjena[-(1:3)],4))
 
 pripremi_dataframe <- function(df){
   names(df)[1] <- "Županija"
   df <- df[order(df$Županija),]
-  df <- df[!(df$Županija == "Neraspoređeno" | df$Županija == "Slobodne zone" | df$Županija == "Ukupno"),]
+  df <- df[!(df$Županija == "Neraspoređeno" | df$Županija == "Slobodne zone" | df$Županija == "Ukupno" | df$Županija == "Nepoznato"),]
   names(df) <- gsub("X", "", names(df))
   rownames(df) <- NULL
   subset(df, select = names(df) %in% procjena_godine)
@@ -661,30 +657,6 @@ iteriraj_po_setu<- function(naziv){
   }
 }
 
-iteriraj_po_setu("grad")
-#industrija
-industrija <- pripremi_dataframe(industrija)
-pom_stanovnici <- subset(stanovnistvo_procjena, select = names(stanovnistvo_procjena) %in% names(industrija))
-  
-rel_podaci <- cbind(industrija[1:2],round(industrija[-(1:2)]/pom_stanovnici[-(1:2)],4))
-  
-write.csv(rel_podaci, "./shiny-app/data/relativno/industrija ukupna vrijednost prodanih proizvoda po NP-u.csv", row.names=FALSE, fileEncoding = "UTF-8")
-  
-
-#kultura
-iteriraj_po_setu("kultura")
-
-#obrazovanje
-iteriraj_po_setu("obrazovanje")
-
-#transport
-iteriraj_po_setu("transport") #oni imaju policijsku upravuuuu
-
-#turizam
-iteriraj_po_setu("turizam")
-
-#zaposlenost
-iteriraj_po_setu("zaposlenost")
-
-#okoliš
-iteriraj_po_setu("zastita")
+for(item in c("grad", "kultura", "obrazovanje", "transport", "turizam", "zaposlenost", "zastita", "uvoz", "izvoz", "stanovnistvo", "industrija")){
+  iteriraj_po_setu(item)
+}

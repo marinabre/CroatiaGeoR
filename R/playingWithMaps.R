@@ -36,7 +36,7 @@ zaposleni <- read.csv("./data/processed data/zaposlenost ukupno zaposleni.csv", 
 
 names(zaposleni)[1] <- "LOCALNAME"
 
-#izbacivanje RH i neraspoređeno
+#izbacivanje RH i nerasporedeno
 zaposleni <- zaposleni[-1,] 
 zaposleni[3,1] <- "Sisačko-moslavačka"
 rownames(zaposleni) <- NULL
