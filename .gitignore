@@ -27,3 +27,4 @@ vignettes/*.pdf
 packrat/lib*/
 /figuresRel/
 /figuresAps/
+*.dcf
