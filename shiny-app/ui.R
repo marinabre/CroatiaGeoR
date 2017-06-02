@@ -43,7 +43,16 @@ body <- dashboardBody(
             p("Kako bi se na osnovu dostupnih podataka mogle donositi što bolje odluke, odnosno, podatke što bolje razumjeti, važno je podatke prikazati na vizualno primjeren način."),
             p("S druge strane, danas postoje programski jezici koji omogućuju naprednu analizu i obradu podataka."),
             p("Zadatak ovog rada je  istražiti mogućnosti programskog jezika R za statističko programiranje te implementirati funkcionalnost koja će omogućiti prikaz podataka vezanih uz određena područja Republike Hrvatske."),
-            p(" Za određene primjere dostupnih podataka potrebno je predložiti te prikazati adekvatan i prihvatljiv način vizualizacije.")
+            p(" Za određene primjere dostupnih podataka potrebno je predložiti te prikazati adekvatan i prihvatljiv način vizualizacije."),
+            h2("Izvori podataka korišteni u izradi aplikacije:"),
+            tags$li(tags$a(href ="www.dzs.hr", "Hrvatski državni zavod za statistiku")),
+            tags$li(tags$a("https://osm.wno-edv-service.de/boundaries/")),
+            tags$li(tags$a(href ="https://www.openstreetmap.org", "OpenStreetmap")),
+            h2("Neki od važnijih korištenih R paketa:"),
+            tags$li(tags$a(href ="https://cran.r-project.org/web/packages/shiny/index.html", "shiny")),
+            tags$li(tags$a(href ="https://cran.r-project.org/web/packages/leaflet/index.html", "leaflet")),
+            tags$li(tags$a(href ="https://cran.r-project.org/web/packages/plotly/index.html", "plotly"))
+            
     ),
     # First tab content
     tabItem(tabName = "mapCRO",
