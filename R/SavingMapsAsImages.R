@@ -15,26 +15,27 @@ setCPLConfigOption("SHAPE_ENCODING", "")
 counties_RH <- readOGR(dsn="./shiny-app/data", layer="Croatia_AL7", stringsAsFactors=F, use_iconv=T, encoding = "UTF-8")
 
  
-# podaci <- read.csv("./shiny-app/data/relativno/stanovnistvo prirodni prirast.csv", stringsAsFactors = F, encoding = "UTF-8")
-# names(podaci)[1] <- "LOCALNAME"
-# spojeno <- merge(counties_RH, podaci, by="LOCALNAME")
-# 
-# minimum <- min(podaci[,-(1)])
-# maximum <- max(podaci[,-(1)])
-# pal <- colorNumeric(c("red", "grey", "green"), c(minimum,maximum))
-# 
-# leaflet(data = spojeno, options = leafletOptions(minZoom = 7, maxZoom = 9)) %>%
-#   addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
-#               opacity = 1.0, fillOpacity = 0.5, fillColor = ~pal(spojeno@data[,'X2002.']),
-#               label = ~LOCALNAME,
-#               highlightOptions = highlightOptions(color = "white", weight = 2,
-#                                                   bringToFront = TRUE))%>%
-#   addLegend("bottomright", pal = pal, values = ~spojeno@data[,'X2002.'],
-#             title = "prirast 2002.",
-#             opacity = 1
-#   )
-# map
-# mapshot(map, file = paste0(getwd(), "/figuresAps/prirast.png"), remove_url = F, selfcontained = FALSE)
+podaci <- read.csv("./shiny-app/data/relativno/transport broj nastradalih u prometu s poginulim osobama.csv", stringsAsFactors = F, encoding = "UTF-8")
+names(podaci)[1] <- "LOCALNAME"
+podaci <- podaci[!(podaci$LOCALNAME == "Republika Hrvatska" | podaci$LOCALNAME == "Ukupno"),] 
+spojeno <- merge(counties_RH, podaci, by="LOCALNAME")
+
+minimum <- min(podaci[,-(1:2)])
+maximum <- max(podaci[,-(1:2)])
+pal <- colorNumeric("Reds", c(minimum,maximum))
+
+map <- leaflet(data = spojeno, options = leafletOptions(minZoom = 7, maxZoom = 9)) %>%
+  addPolygons(color = "#444444", weight = 1, smoothFactor = 0.5,
+              opacity = 1.0, fillOpacity = 0.5, fillColor = ~pal(spojeno@data[,'X2004.']),
+              label = ~LOCALNAME,
+              highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                  bringToFront = TRUE))%>%
+  addLegend("bottomright", pal = pal, values = ~spojeno@data[,'X2004.'],
+            title = "broj poginulih u prometu 2004.",
+            opacity = 1, labFormat = labelFormat( transform = function(x) 1000 * x, suffix="‰", digits=4)
+  )
+map
+mapshot(map, file = paste0(getwd(), "/text/poginuli_rel.png"), remove_url = F, selfcontained = FALSE)
 
 save_Maps <- function(source, dest, uzorak, paleta){
   for(srcFile in source){

@@ -180,18 +180,14 @@ server <- function(input, output, session) {
     #ALELUJA
     fname <- "./www/gif/APS BDP u tisucama eura.gif"
     list(src=fname,
-         contentType="image/gif",
-         width = 823,
-         height = 617
+         contentType="image/gif"
          )
     }, deleteFile=FALSE)
   output$gifDva <- renderImage({
     #ALELUJA
     fname <- "./www/gif/REL BDP u tisucama eura.gif"
     list(src=fname,
-         contentType="image/gif",
-         width = 823,
-         height = 617
+         contentType="image/gif"
     )
   }, deleteFile=FALSE)
   

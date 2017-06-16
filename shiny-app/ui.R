@@ -116,11 +116,29 @@ body <- dashboardBody(
     )
     ),
     tabItem(tabName = "gifCRO",
+            tags$head(tags$style(
+              type="text/css",
+              "#gifJedan img {max-width: 100%; width: 100%; height: auto}"
+            )),
+            tags$head(tags$style(
+              type="text/css",
+              "#gifDva img {max-width: 100%; width: 100%; height: auto}"
+            )),
             fluidRow(
-              imageOutput("gifJedan")
+              column(6,
+                     h3("Apsolutni podaci")
+              ),
+              column(6,
+                     h3("Relativni podaci (Po stanovniku županije)")
+              )
             ),
             fluidRow(
+              column(6,
+                imageOutput("gifJedan")
+              ),
+              column(6,
                 imageOutput("gifDva")
+              )
             )
           ),
     # Fourth tab content
