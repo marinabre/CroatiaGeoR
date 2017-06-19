@@ -139,7 +139,8 @@ body <- dashboardBody(
               column(6,
                 imageOutput("gifDva")
               )
-            )
+            ),
+            tags$footer("Napomena: U relativnim podacima su samo pokrivene godine iz skupa [2001.,2015.] jer za njih postoji podatak o broju stanovnika")
           ),
     # Fourth tab content
     tabItem(tabName = "upload",
@@ -170,8 +171,7 @@ body <- dashboardBody(
         )
       )
     )
-  )
-)
+  ))
 
 
 ui <- dashboardPage(header, sidebar, body)

@@ -24,4 +24,10 @@ mycss <- "
   }
   #plot.recalculating {
     z-index: -2;
+  }
+  footer {
+    clear: both;
+    position: absolute;
+    z-index: 10;
+    bottom: 1%;
   }"
