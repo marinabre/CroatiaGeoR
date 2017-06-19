@@ -26,7 +26,7 @@ sidebar <- dashboardSidebar(
     menuItem("Pojedina županija", tabName = "countyCRO", icon = icon("location-arrow")),
     menuItem("Podaci prikazani grafom", tabName = "graphCRO", icon = icon("bar-chart")),
     menuItem("Podaci prikazani gifom", tabName = "gifCRO", icon = icon("picture-o")),
-    selectInput("file_source", "Izvor podataka", source_files, selected = source_files[1]),
+    selectInput("file_source", "Skup podataka", source_files, selected = source_files[1]),
     menuItem("Unos vlastitih podataka", tabName = "upload", icon = icon("cloud-upload")),
     checkboxInput("relAps", "Relativni podaci", FALSE)
   )

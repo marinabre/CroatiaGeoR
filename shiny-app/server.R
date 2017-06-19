@@ -17,6 +17,13 @@ library(ggplot2)
 library(plotly)
 
 server <- function(input, output, session) {
+  
+  input_source_files <- reactive({
+    if(input$relAps == TRUE)
+      rel_source_files
+    else
+      source_files
+  })
 
   output$show_warning <- output$show_warning1 <- output$show_warning2 <- renderUI({
     inFile <- input$file1
@@ -102,7 +109,7 @@ server <- function(input, output, session) {
   })
   
   data_y_label <- reactive({
-    gsub(".csv", "", gsub("./data/[a-zA-Z]* ", "", file_name()))
+    ifelse(input$relAps, paste(gsub(".csv", "", gsub("./data/relative/[a-zA-Z]* ", "", file_name())), " po stanovniku"), gsub(".csv", "", gsub("./data/[a-zA-Z]* ", "", file_name())) )
   })
   
   pie_plot_legend <- reactive({
@@ -176,16 +183,22 @@ server <- function(input, output, session) {
     theme(axis.text.x = element_text(angle = 90))
   })
   
+  file_name_gif <- reactive({
+    if(input$relAps){
+      gsub(".csv", "", gsub("./data/relative/", "", file_name()))
+    }else{
+      gsub(".csv", "", gsub("./data/", "", file_name()))
+    }
+  })
+  
   output$gifJedan <- renderImage({
-    #ALELUJA
-    fname <- "./www/gif/APS BDP u tisucama eura.gif"
+    fname <- paste0("./www/gif/APS ", file_name_gif() ,".gif")
     list(src=fname,
          contentType="image/gif"
          )
     }, deleteFile=FALSE)
   output$gifDva <- renderImage({
-    #ALELUJA
-    fname <- "./www/gif/REL BDP u tisucama eura.gif"
+    fname <- paste0("./www/gif/REL ", file_name_gif() ,".gif")
     list(src=fname,
          contentType="image/gif"
     )
@@ -196,17 +209,21 @@ server <- function(input, output, session) {
   #?theme
   observe({
       updateSelectInput(session, "years",
-                        label = "Godine podataka",
                         choices = names(data_input())[-(1:2)], selected = tail(names(data_input())[-(1:2)], 1) )
       updateSelectInput(session, "years2",
-                        label = "Godine podataka",
                         choices = names(data_input())[-(1:2)], selected = tail(names(data_input())[-(1:2)], 1) )
       updateSelectInput(session, "counties",
                         label = "Odabir županije",
                         choices = data_input()[,1], selected = data_input()[,1][2] )
       updateSelectInput(session, "counties_multiple",
-                        label = "Odabir županija za prikaz",
                         choices = data_input()[,1], selected = data_input()[,1][2] )
+      
+      #so it doesn't get hit every single time the user selects something 
+      if((input$relAps && !grepl(".data/relative/", input$file_source)) || (input$relAps == F && grepl(".data/relative/", input$file_source)))
+      {
+        updateSelectInput(session, "file_source",
+                          choices = input_source_files(), selected = input_source_files()[1] )
+      }
 
    })
   

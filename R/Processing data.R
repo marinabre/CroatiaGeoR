@@ -52,12 +52,12 @@ uvoz <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xlsx", 
 names(uvoz) <- names(izvoz)
 uvoz <- ocisti_dataframe(uvoz)
 
-write.csv((izvoz), "./shiny-app/data/izvoz u tisucama kuna.csv", row.names=FALSE, fileEncoding = "UTF-8")
+write.csv((izvoz), "./shiny-app/data/roba izvoz u tisucama kuna.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
 uvoz$`2015.` <- uvoz$`2015.` / 1000
 uvoz$`2016.` <- uvoz$`2016.` / 1000
 
-write.csv((uvoz), "./shiny-app/data/uvoz u tisucama kuna.csv", row.names=FALSE, fileEncoding = "UTF-8")
+write.csv((uvoz), "./shiny-app/data/roba uvoz u tisucama kuna.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
 
 
@@ -79,11 +79,11 @@ uvozEuri <- read.xlsx("./data/statistika u nizu/Robna razmjena s inozemstvom.xls
 names(uvozEuri) <- names(izvozEuri)
 uvozEuri <- ocisti_dataframe(uvozEuri)
 uvozEuri$Županija <- izvoz$Županija
-write.csv((izvozEuri), "./shiny-app/data/izvoz u tisucama eura.csv", row.names=FALSE, fileEncoding = "UTF-8")
+write.csv((izvozEuri), "./shiny-app/data/roba izvoz u tisucama eura.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
 ## 2012. - 2016. su pomnožene sa 1000
 uvozEuri[,5:9] <- uvozEuri[,5:9] / 1000
-write.csv((uvozEuri), "./shiny-app/data/uvoz u tisucama eura.csv", row.names=FALSE, fileEncoding = "UTF-8")
+write.csv((uvozEuri), "./shiny-app/data/roba uvoz u tisucama eura.csv", row.names=FALSE, fileEncoding = "UTF-8")
 
 
 # Bruto domaci proizvod.xlsx ############################# 
@@ -657,6 +657,6 @@ iteriraj_po_setu<- function(naziv){
   }
 }
 
-for(item in c("grad", "kultura", "obrazovanje", "transport", "turizam", "zaposlenost", "zastita", "uvoz", "izvoz", "stanovnistvo", "industrija")){
+for(item in c("grad", "kultura", "obrazovanje", "transport", "turizam", "zaposlenost", "zastita", "roba", "stanovnistvo", "industrija")){
   iteriraj_po_setu(item)
 }
