@@ -185,24 +185,34 @@ server <- function(input, output, session) {
   
   file_name_gif <- reactive({
     if(input$relAps){
-      gsub(".csv", "", gsub("./data/relative/", "", file_name()))
+      paste0(gsub(".csv", "", gsub("./data/relative/", "", file_name())),".gif")
     }else{
-      gsub(".csv", "", gsub("./data/", "", file_name()))
+      paste0(gsub(".csv", "", gsub("./data/", "", file_name())),".gif")
     }
   })
   
   output$gifJedan <- renderImage({
-    fname <- paste0("./www/gif/APS ", file_name_gif() ,".gif")
-    list(src=fname,
-         contentType="image/gif"
-         )
+    fname <- paste("./www/gif/APS", file_name_gif())
+    if (length(
+        list.files(path = "./www/gif/", pattern = paste("APS", file_name_gif()), all.files = T, full.names = T, recursive = F)
+        ) != 0) {
+      list(src = fname, contentType = "image/gif")
+    } else{
+      list(src = "./www/nedostupan_gif.png", contentType = "image/png")
+    }
     }, deleteFile=FALSE)
+  
+  
   output$gifDva <- renderImage({
-    fname <- paste0("./www/gif/REL ", file_name_gif() ,".gif")
-    list(src=fname,
-         contentType="image/gif"
-    )
-  }, deleteFile=FALSE)
+    fname <- paste("./www/gif/REL", file_name_gif())
+    if (length(
+      list.files(path = "./www/gif/", pattern = paste("REL", file_name_gif()), all.files = T, full.names = T, recursive = F)
+    ) != 0) {
+      list(src = fname, contentType = "image/gif")
+    } else{
+      list(src = "./www/nedostupan_gif.png", contentType = "image/png")
+    }
+  }, deleteFile = FALSE)
   
   
   

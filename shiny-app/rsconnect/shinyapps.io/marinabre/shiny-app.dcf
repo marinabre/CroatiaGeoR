@@ -3,8 +3,8 @@ title: shiny-app
 account: marinabre
 server: shinyapps.io
 appId: 172703
-bundleId: 872417
+bundleId: 874238
 url: https://marinabre.shinyapps.io/shiny-app/
-when: 1497816653.11015
+when: 1497906840.54886
 asMultiple: FALSE
 asStatic: FALSE
